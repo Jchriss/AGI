@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/device_configuration_add_device_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:gravity="center_vertical"
+            android:text="@string/page_device_configure_hint_ip"
+            android:textSize="20sp" />
+
+        <EditText
+            android:id="@+id/device_configure_ip"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:textSize="15sp" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/device_configure_dataPort"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:gravity="center_vertical"
+        android:hint="@string/page_device_configure_hint_dataPort"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/device_configure_messagePort"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:gravity="center_vertical"
+        android:hint="@string/page_device_configure_hint_messagePort"
+        android:textSize="20sp" />
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:gravity="center_vertical"
+            android:text="@string/page_device_configure_hint_board_type"
+            android:textSize="20sp" />
+
+        <RadioGroup
+            android:id="@+id/radiogroup1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_x="3px"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/device_configure_hint_board_type_tdd"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginLeft="10dp"
+                android:gravity="center"
+                android:checked="true"
+                android:text="@string/page_device_configure_hint_board_type_tdd" />
+
+            <RadioButton
+                android:id="@+id/device_configure_hint_board_type_fdd"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginLeft="10dp"
+                android:gravity="center"
+                android:text="@string/page_device_configure_hint_board_type_fdd" />
+        </RadioGroup>
+
+    </LinearLayout>
+</LinearLayout>

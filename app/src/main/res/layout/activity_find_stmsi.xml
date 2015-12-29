@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/find_stmsi_layout_control"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/find_stmsi_start_button"
+            android:layout_width="wrap_content"
+            android:layout_height="38dp"
+            android:text="@string/page_find_stmis_start"
+            android:textSize="15sp" />
+
+        <Button
+            android:id="@+id/find_stmsi_stop_button"
+            android:layout_width="wrap_content"
+            android:layout_height="38dp"
+            android:text="@string/page_find_stmis_stop"
+            android:textSize="15sp" />
+
+    </LinearLayout>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:id="@+id/find_stmsi_layout_info"
+        android:layout_below="@+id/find_stmsi_layout_control"
+        android:layout_height="30dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:gravity="center_vertical"
+            android:text="@string/page_find_stmis_current_times"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/find_stmsi_triggered_count"
+            android:layout_width="40dp"
+            android:layout_height="30dp"
+            android:gravity="center_vertical"
+            android:textSize="15sp" />
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:gravity="center_vertical"
+            android:text="@string/page_find_stmis_target"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/find_stmsi_target_phone_num"
+            android:layout_width="100dp"
+            android:layout_height="30dp"
+            android:gravity="center_vertical"
+            android:textSize="15sp" />
+
+    </LinearLayout>
+
+    <android.support.percent.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/find_stmsi_layout_sort_by_count"
+        android:layout_below="@+id/find_stmsi_layout_info"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:layout_gravity="center">
+
+        <ImageView
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:background="#000000" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:gravity="center"
+            android:text="@string/page_find_stmis_sort_by_count"
+            app:layout_heightPercent="100%" />
+    </android.support.percent.PercentRelativeLayout>
+
+    <android.support.percent.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:id="@+id/find_stmsi_layout_count_list_title"
+        android:layout_below="@+id/find_stmsi_layout_sort_by_count"
+        android:layout_height="20dp">
+
+        <TextView
+            android:id="@+id/find_stmsi_count_stmsi"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:gravity="center"
+            android:text="@string/page_find_stmis_title_stmsi"
+            app:layout_heightPercent="100%"
+            app:layout_widthPercent="60%" />
+
+        <TextView
+            android:id="@+id/find_stmsi_count_count"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_toRightOf="@+id/find_stmsi_count_stmsi"
+            android:gravity="center"
+            android:text="@string/page_find_stmis_title_count"
+            app:layout_heightPercent="100%"
+            app:layout_widthPercent="40%" />
+
+    </android.support.percent.PercentRelativeLayout>
+
+    <ListView
+        android:layout_below="@+id/find_stmsi_layout_count_list_title"
+        android:id="@+id/find_stmsi_count_listView"
+        android:layout_width="fill_parent"
+        android:layout_height="180dp" />
+
+    <android.support.percent.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_below="@+id/find_stmsi_count_listView"
+        android:id="@+id/find_stmsi_layout_sort_by_time"
+        android:layout_height="25dp"
+        android:layout_gravity="center">
+
+        <ImageView
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:background="#000000" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:gravity="center"
+            android:text="@string/page_find_stmis_sort_by_time"
+            app:layout_heightPercent="100%" />
+    </android.support.percent.PercentRelativeLayout>
+
+    <android.support.percent.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_below="@+id/find_stmsi_layout_sort_by_time"
+        android:id="@+id/find_stmsi_layout_time_list_title"
+        android:layout_height="20dp">
+
+        <TextView
+            android:id="@+id/find_stmsi_time_stmsi"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:gravity="center"
+            android:text="@string/page_find_stmis_title_stmsi"
+            app:layout_heightPercent="100%"
+            app:layout_widthPercent="30%" />
+
+        <TextView
+            android:id="@+id/find_stmsi_time_time"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_toRightOf="@+id/find_stmsi_time_stmsi"
+            android:gravity="center"
+            android:text="@string/page_find_stmis_title_time"
+            app:layout_heightPercent="100%"
+            app:layout_widthPercent="30%" />
+
+        <TextView
+            android:id="@+id/find_stmsi_time_pci"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_toRightOf="@+id/find_stmsi_time_time"
+            android:gravity="center"
+            android:text="@string/page_find_stmis_title_pci"
+            app:layout_heightPercent="100%"
+            app:layout_widthPercent="15%" />
+
+        <TextView
+            android:id="@+id/find_stmsi_time_board"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_toRightOf="@+id/find_stmsi_time_pci"
+            android:gravity="center"
+            android:text="@string/page_find_stmis_title_board"
+            app:layout_heightPercent="100%"
+            app:layout_widthPercent="25%" />
+
+    </android.support.percent.PercentRelativeLayout>
+
+    <ListView
+        android:id="@+id/find_stmsi_time_listView"
+        android:layout_width="fill_parent"
+        android:layout_below="@+id/find_stmsi_layout_time_list_title"
+        android:layout_height="fill_parent"
+        android:layout_above="@+id/find_stmsi_layout_target_stmsi"/>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:gravity="center"
+        android:id="@+id/find_stmsi_layout_target_stmsi"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:gravity="center_vertical"
+            android:text="@string/page_find_stmsi_target_stmsi"
+            android:textSize="15sp" />
+
+        <EditText
+            android:id="@+id/find_stmsi_target_stmsi"
+            android:layout_width="150dp"
+            android:layout_height="35dp"
+            android:gravity="center_vertical"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+</RelativeLayout>

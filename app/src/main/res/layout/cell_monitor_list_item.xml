@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:drawingCacheQuality="high"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/cell_monitor_item_earfcn"
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/cell_monitor_item_pci"
+        android:layout_width="45dp"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/cell_monitor_item_earfcn"
+        android:layout_centerVertical="true"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/cell_monitor_item_tai"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/cell_monitor_item_pci"
+        android:layout_centerVertical="true"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/cell_monitor_item_sinr"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/cell_monitor_item_tai"
+        android:layout_centerVertical="true"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/cell_monitor_item_rsrp"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/cell_monitor_item_sinr"
+        android:layout_centerVertical="true"
+        android:gravity="center" />
+
+    <CheckBox
+        android:id="@+id/cell_monitor_item_choose"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/cell_monitor_item_rsrp"
+        android:layout_centerVertical="true"
+        android:gravity="center" />
+
+</RelativeLayout>
+    <!--
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.percent.PercentRelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/cell_monitor_item_earfcn"
+        android:layout_width="0dp"
+        app:layout_heightPercent="7%"
+        android:layout_height="0dp"
+        android:gravity="center"
+        app:layout_widthPercent="20%" />
+
+    <TextView
+        android:id="@+id/cell_monitor_item_pci"
+        android:layout_toRightOf="@+id/cell_monitor_item_earfcn"
+        android:layout_width="0dp"
+        app:layout_heightPercent="7%"
+        android:layout_height="0dp"
+        android:gravity="center"
+        app:layout_widthPercent="12%" />
+
+    <TextView
+        android:id="@+id/cell_monitor_item_tai"
+        android:layout_toRightOf="@+id/cell_monitor_item_pci"
+        android:layout_width="0dp"
+        app:layout_heightPercent="7%"
+        android:layout_height="0dp"
+        android:gravity="center"
+        app:layout_widthPercent="13%" />
+
+    <TextView
+        android:id="@+id/cell_monitor_item_sinr"
+        android:layout_toRightOf="@+id/cell_monitor_item_tai"
+        android:layout_width="0dp"
+        app:layout_heightPercent="7%"
+        android:layout_height="0dp"
+        android:gravity="center"
+        app:layout_widthPercent="20%" />
+
+    <TextView
+        android:id="@+id/cell_monitor_item_rsrp"
+        android:layout_toRightOf="@+id/cell_monitor_item_sinr"
+        android:layout_width="0dp"
+        app:layout_heightPercent="7%"
+        android:layout_height="0dp"
+        android:gravity="center"
+        app:layout_widthPercent="25%" />
+
+    <CheckBox
+        android:id="@+id/cell_monitor_item_choose"
+        android:layout_toRightOf="@+id/cell_monitor_item_rsrp"
+        android:layout_width="0dp"
+        app:layout_heightPercent="7%"
+        android:layout_height="0dp"
+        android:gravity="center"
+        app:layout_widthPercent="10%" />
+
+</android.support.percent.PercentRelativeLayout>
+-->

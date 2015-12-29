@@ -1,0 +1,229 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/test_cell_monitor_activity"
+    android:layout_width="match_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:gravity="center"
+        android:text="@string/page_test_cell_monitor_manual_cell" />
+
+    <android.support.percent.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_gravity="center">
+
+        <TextView
+            android:id="@+id/cell_monitor_manual_earfcn_text"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:gravity="center"
+            android:text="@string/page_test_cell_monitor_item_earfcn"
+            app:layout_heightPercent="100%"
+            app:layout_widthPercent="20%" />
+
+        <EditText
+            android:id="@+id/cell_monitor_manual_earfcn"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_toRightOf="@+id/cell_monitor_manual_earfcn_text"
+            android:gravity="center"
+            android:inputType="number"
+            android:textSize="13sp"
+            app:layout_heightPercent="100%"
+            app:layout_widthPercent="25%" />
+
+        <TextView
+            android:id="@+id/cell_monitor_manual_pci_text"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_toRightOf="@+id/cell_monitor_manual_earfcn"
+            android:gravity="center"
+            android:text="@string/page_test_cell_monitor_item_pci"
+            app:layout_heightPercent="100%"
+            app:layout_widthPercent="15%" />
+
+        <EditText
+            android:id="@+id/cell_moitor_manual_pci"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:gravity="center"
+            android:layout_toRightOf="@+id/cell_monitor_manual_pci_text"
+            android:inputType="number"
+            android:textSize="13sp"
+            app:layout_heightPercent="100%"
+            app:layout_widthPercent="15%" />
+
+        <CheckBox
+            android:id="@+id/cell_moitor_manual_choose"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_toRightOf="@+id/cell_moitor_manual_pci"
+            android:text="@string/page_test_cell_monitor_choose"
+            app:layout_heightPercent="100%"
+            app:layout_widthPercent="20%" />
+
+    </android.support.percent.PercentRelativeLayout>
+
+    <android.support.percent.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_gravity="center">
+
+        <ImageView
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:background="#000000" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:gravity="center"
+            android:text="@string/page_test_cell_monitor_auto_cell"
+            app:layout_heightPercent="100%" />
+    </android.support.percent.PercentRelativeLayout>
+
+    <android.support.percent.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="40dp">
+
+        <TextView
+            android:id="@+id/cell_monitor_list_earfcn"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:gravity="center"
+            android:text="@string/page_test_cell_monitor_item_earfcn"
+            app:layout_heightPercent="100%"
+            app:layout_widthPercent="20%" />
+
+        <TextView
+            android:id="@+id/cell_monitor_list_pci"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_toRightOf="@+id/cell_monitor_list_earfcn"
+            android:gravity="center"
+            android:text="@string/page_test_cell_monitor_item_pci"
+            app:layout_heightPercent="100%"
+            app:layout_widthPercent="12%" />
+
+        <TextView
+            android:id="@+id/cell_monitor_list_tai"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_toRightOf="@+id/cell_monitor_list_pci"
+            android:gravity="center"
+            android:text="@string/page_test_cell_monitor_item_tai"
+            app:layout_heightPercent="100%"
+            app:layout_widthPercent="13%" />
+
+        <TextView
+            android:id="@+id/cell_monitor_list_sinr"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_toRightOf="@+id/cell_monitor_list_tai"
+            android:gravity="center"
+            android:text="@string/page_test_cell_monitor_item_sinr"
+            app:layout_heightPercent="100%"
+            app:layout_widthPercent="20%" />
+
+        <TextView
+            android:id="@+id/cell_monitor_list_rsrp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_toRightOf="@+id/cell_monitor_list_sinr"
+            android:gravity="center"
+            android:text="@string/page_test_cell_monitor_item_rsrp"
+            app:layout_heightPercent="100%"
+            app:layout_widthPercent="25%" />
+
+        <TextView
+            android:id="@+id/cell_monitor_list_choose"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_toRightOf="@+id/cell_monitor_list_rsrp"
+            android:gravity="center"
+            android:text="@string/page_test_cell_monitor_choose"
+            app:layout_heightPercent="100%"
+            app:layout_widthPercent="10%" />
+
+    </android.support.percent.PercentRelativeLayout>
+
+    <ListView
+        android:id="@+id/cell_monitor_listView"
+        android:layout_width="fill_parent"
+        android:layout_height="200dp" />
+
+    <android.support.percent.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_gravity="center">
+
+        <ImageView
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:background="#000000" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:gravity="center"
+            android:text="@string/page_test_cell_monitor_cell_list"
+            app:layout_heightPercent="100%" />
+    </android.support.percent.PercentRelativeLayout>
+    <android.support.percent.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="40dp">
+
+        <TextView
+            android:id="@+id/cell_monitor_confirm_list_earfcn"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:gravity="center"
+            android:text="@string/page_test_cell_monitor_item_earfcn"
+            app:layout_heightPercent="100%"
+            app:layout_widthPercent="25%" />
+
+        <TextView
+            android:id="@+id/cell_monitor_confirm_list_pci"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_toRightOf="@+id/cell_monitor_confirm_list_earfcn"
+            android:gravity="center"
+            android:text="@string/page_test_cell_monitor_item_pci"
+            app:layout_heightPercent="100%"
+            app:layout_widthPercent="25%" />
+
+        <TextView
+            android:id="@+id/cell_monitor_confirm_list_tai"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_toRightOf="@+id/cell_monitor_confirm_list_pci"
+            android:gravity="center"
+            android:text="@string/page_test_cell_monitor_item_tai"
+            app:layout_heightPercent="100%"
+            app:layout_widthPercent="25%" />
+
+
+        <TextView
+            android:id="@+id/cell_monitor_confirm_list_board"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_toRightOf="@+id/cell_monitor_confirm_list_tai"
+            android:gravity="center"
+            android:text="@string/page_test_cell_monitor_board"
+            app:layout_heightPercent="100%"
+            app:layout_widthPercent="25%" />
+
+    </android.support.percent.PercentRelativeLayout>
+    <ListView
+        android:id="@+id/cell_monitor_confirm_listView"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
+</LinearLayout>

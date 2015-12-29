@@ -1,0 +1,130 @@
+<resources>
+    <string name="app_name">便携式LTE定位系统</string>
+
+    <!-- login page -->
+    <string name="page_login_name">用户名</string>
+    <string name="page_login_password">密码</string>
+    <string name="page_login_login">登陆</string>
+    <string name="title_activity_login">便携式LTE定位系统</string>
+
+    <!-- control center page -->
+    <string name="page_center_configure">配置</string>
+    <string name="page_center_start">开始侧向</string>
+    <string name="title_activity_control_center">管理中心</string>
+
+    <!-- device configure page -->
+    <string name="title_activity_device_configuration">设备管理</string>
+    <string name="title_device_configuration_show_detail">详细信息</string>
+    <string name="title_device_configuration_confirm_delete">确认删除?</string>
+    <string name="menu_device_configuration">添加设备</string>
+    <string name="menu_device_configuration_dialog_add">添加</string>
+    <string name="menu_device_configuration_dialog_cancel">取消</string>
+    <string name="menu_device_configuration_save">保存</string>
+    <string name="page_device_configure_detail">详情</string>
+    <string name="page_device_configure_hint_device_name">设备名称:</string>
+    <string name="page_device_configure_hint_ip">IP 地址:</string>
+    <string name="page_device_configure_hint_messagePort">消息端口 : 3334</string>
+    <string name="page_device_configure_hint_dataPort">数据端口 : 3333</string>
+    <string name="page_device_configure_hint_board_type">板卡类型: </string>
+    <string name="page_device_configure_hint_board_type_tdd">TDD</string>
+    <string name="page_device_configure_hint_board_type_fdd">FDD</string>
+    <string name="page_device_configure_switch_off">关</string>
+    <string name="page_device_configure_switch_on">开</string>
+    <string name="page_device_configure_show_detail_ok">确定</string>
+    <string name="page_device_configure_show_detail_delete">删除</string>
+    <string name="page_device_configure_confirm_delete_ok">确定</string>
+    <string name="page_device_configure_confirm_delete_cancel">取消</string>
+
+    <!-- system configuration page -->
+    <string name="title_activity_system_configuration">系统参数配置</string>
+    <string name="menu_system_configuration_save">保存</string>
+    <string name="page_system_configure_target">目标号码</string>
+    <string name="page_system_configure_trigger">触发方式</string>
+    <string name="page_system_configure_trigger_SMS">短信</string>
+    <string name="page_system_configure_trigger_phone">电话</string>
+    <string name="page_system_configure_trigger_max">触发总次数（次）</string>
+    <string name="page_system_configure_SMS_interval">触发间隔（秒）</string>
+    <string name="page_system_configure_filter_seconds">过滤门限（秒）</string>
+    <string name="page_system_configure_orientation_data_refresh_interval">测向数据刷新间隔</string>
+    <string name="page_system_configure_SINR_threshold">信噪比门限</string>
+    <string name="page_system_configure_silence_timer">静默定时器（秒）</string>
+    <string name="page_system_configure_receiving_antenna_count">接收天线数</string>
+
+    <!-- cell monitor -->
+    <string name="title_activity_test_cell_monitor">守控小区</string>
+    <string name="page_test_cell_monitor_next_step">保存</string>
+    <string name="page_test_cell_monitor_item_earfcn">EARFCN</string>
+    <string name="page_test_cell_monitor_item_pci">PCI</string>
+    <string name="page_test_cell_monitor_item_tai">TAI</string>
+    <string name="page_test_cell_monitor_item_sinr">SINR(dB)</string>
+    <string name="page_test_cell_monitor_item_rsrp">RSRP(dBm)</string>
+    <string name="page_test_cell_monitor_manual_cell">手动指定小区</string>
+    <string name="page_test_cell_monitor_auto_cell">自动搜索小区</string>
+    <string name="page_test_cell_monitor_cell_list">守控小区列表</string>
+    <string name="page_test_cell_monitor_choose">守控</string>
+    <string name="page_test_cell_monitor_board">板卡</string>
+
+
+    <!-- Main activity -->
+    <string name="title_main_cell_monitor">小区守控配置</string>
+    <string name="title_main_find_STMSI">寻找STMSI</string>
+    <string name="title_main_orientation">测向</string>
+    <string name="page_cell_monitor_device_name">"设备名称"</string>
+    <string name="page_cell_monitor_earfcn">"Earfcn"</string>
+    <string name="page_cell_monitor_pci">"PCI"</string>
+    <string name="page_cell_monitor_start_monitor">"开始监控"</string>
+    <string name="page_find_stmsi_device_name">"设备名称"</string>
+    <string name="page_find_stmis_start">"开始"</string>
+    <string name="page_find_stmis_stop">"停止"</string>
+    <string name="page_find_stmis_target">目标号码:</string>
+    <string name="page_find_stmis_current_times">已触发次数:</string>
+    <string name="page_find_stmis_sort_by_count">按次数排序</string>
+    <string name="page_find_stmis_title_stmsi">STMSI</string>
+    <string name="page_find_stmis_title_count">次数</string>
+    <string name="page_find_stmis_sort_by_time">按时间排序</string>
+    <string name="page_find_stmis_title_time">时间</string>
+    <string name="page_find_stmis_title_pci">PCI</string>
+    <string name="page_find_stmis_title_board">板卡</string>
+    <string name="page_find_stmsi_target_stmsi">目标STMSI :</string>
+    <string name="menu_find_stmsi_save">保存</string>
+    <string name="page_orientation_find_device_name">"设备名称"</string>
+    <string name="page_orientation_find_stmsi">"STMSI"</string>
+    <string name="page_orientation_find_start">"开始"</string>
+    <string name="page_orientation_find_stop">"停止"</string>
+    <string name="page_orientation_find_result_list_title_pucch">PUCCH</string>
+    <string name="page_orientation_find_result_list_title_pusch">PUSCH</string>
+    <string name="page_orientation_find_result_list_title_time">Time</string>
+    <string name="page_orientation_find_result_list_title_pci">PCI</string>
+    <string name="page_orientation_find_result_graph_pucch">PUCCH</string>
+    <string name="page_orientation_find_result_graph_pusch">PUSCH</string>
+    <string name="page_orientation_find_my_stmsi">本机STMSI :</string>
+    <string name="page_orientation_find_target_stmsi">目标STMSI :</string>
+
+    <!-- test cell montor -->
+    <string name="page_test_cell_monitor_start">"开始"</string>
+    <string name="page_test_cell_monitor_stop">"停止"</string>
+
+    <!-- welcome page -->
+    <string name="page_welcome_version">version 1.0</string>
+    <string name="title_activity_welcome">欢迎</string>
+
+    <!-- test -->
+    <string name="login_label_username">用户名:</string>
+    <string name="login_label_password">密码:</string>
+    <string name="login_label_signin">登 录</string>
+    <string name="login_register_link">没有帐号？ <a href="http://fanfou.com/register">注册</a></string>
+
+
+    <string name="send">send</string>
+    <string name="register">register</string>
+    <string name="getUserInfo">getUserInfo</string>
+    <string name="update">update</string>
+    <string name="delete">delete</string>
+
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_cell_monitor">CellMonitorActivity</string>
+
+
+</resources>
