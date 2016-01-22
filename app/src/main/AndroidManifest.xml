@@ -47,41 +47,37 @@
         android:label="@string/app_name"
         android:launchMode="singleInstance"
         android:theme="@style/AppTheme">
-
         <activity
             android:name=".ui.WelcomeActivity"
             android:label="@string/app_name"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen">>
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
-            android:name=".ui.DeviceConfigurationActivity"
-            android:label="@string/title_activity_device_configuration"
-            android:launchMode="singleTask" />
-        <activity
-            android:name=".ui.SystemConfigurationActivity"
-            android:label="@string/title_activity_system_configuration"
+            android:name=".ui.MainMenuActivity"
+            android:label="@string/app_name"
             android:launchMode="singleTask" />
         <activity
             android:name=".ui.FindSTMSIActivity"
-            android:label="@string/title_main_find_STMSI"
+            android:label="@string/title_main_menu_find_STMSI"
             android:launchMode="singleTask" />
         <activity
             android:name=".ui.CellMonitorActivity"
-            android:label="@string/title_activity_test_cell_monitor"
+            android:label="@string/title_main_menu_cell_monitor"
             android:launchMode="singleTask" />
         <activity
             android:name=".ui.OrientationFindingActivity"
-            android:label="@string/title_main_orientation"
+            android:label="@string/title_main_menu_orientation"
             android:launchMode="singleTask" />
-
+        <activity android:name=".ui.ConfigurationActivity"
+            android:label="@string/title_main_menu_configuration"
+            android:launchMode="singleTask"/>
         <service android:name=".external.service.MonitorService" />
-
     </application>
 
 </manifest>

@@ -98,9 +98,9 @@ public class FindSTMSIActivity extends AppCompatActivity {
             }
         });
 
-        time = (ListView) findViewById(R.id.find_stmsi_time_listView);
+        //time = (ListView) findViewById(R.id.find_stmsi_time_listView);
         TimeAdapter timeAdapter = new TimeAdapter(this);
-        time.setAdapter(timeAdapter);
+        //time.setAdapter(timeAdapter);
 
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -270,7 +270,7 @@ public class FindSTMSIActivity extends AppCompatActivity {
     private void saveToNext() {
         String stmsi = targetSTMSI.getText().toString();
         if (validateSTMSI(stmsi)) {
-            Intent intent = new Intent(this, OrientationFindingActivity.class);
+            Intent intent = new Intent(this, MainMenuActivity.class);
             intent.putExtra(Global.TARGET_STMSI, stmsi);
             startActivity(intent);
         }

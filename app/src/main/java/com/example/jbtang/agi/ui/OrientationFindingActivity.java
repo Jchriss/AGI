@@ -85,7 +85,7 @@ public class OrientationFindingActivity extends AppCompatActivity {
     }
 
     private void init() {
-        myStmsiTextView = (TextView) findViewById(R.id.orientation_find_my_stmsi);
+        //myStmsiTextView = (TextView) findViewById(R.id.orientation_find_my_stmsi);
         targetStmsiTextView = (TextView) findViewById(R.id.orientation_find_target_stmsi);
         startButton = (Button) findViewById(R.id.orientation_find_start);
         stopButton = (Button) findViewById(R.id.orientation_find_stop);

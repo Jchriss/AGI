@@ -437,7 +437,7 @@ public class CellMonitorActivity extends AppCompatActivity {
         if (validate(deviceMap, cellInfoMap)) {
             distributeToMonitor(deviceMap, cellInfoMap);
 
-            Intent intent = new Intent(this, FindSTMSIActivity.class);
+            Intent intent = new Intent(this, MainMenuActivity.class);
             startActivity(intent);
         }
     }

@@ -35,7 +35,7 @@ public class WelcomeActivity extends Activity {
             @Override
             public void run() {
                 Global.UserInfo.user_name = "admin";
-                Intent intent = new Intent(WelcomeActivity.this, DeviceConfigurationActivity.class);
+                Intent intent = new Intent(WelcomeActivity.this, MainMenuActivity.class);
                 startActivity(intent);
                 WelcomeActivity.this.finish();
             }

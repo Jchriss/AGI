@@ -1,10 +1,11 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/test_cell_monitor_activity"
     android:layout_width="match_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical">
 
     <TextView
+        android:id="@+id/cell_monitor_manual_title"
         android:layout_width="match_parent"
         android:layout_height="30dp"
         android:gravity="center"
@@ -12,9 +13,11 @@
 
     <android.support.percent.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/cell_monitor_manual"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:layout_gravity="center">
+        android:layout_gravity="center"
+        android:layout_below="@+id/cell_monitor_manual_title">
 
         <TextView
             android:id="@+id/cell_monitor_manual_earfcn_text"
@@ -70,9 +73,11 @@
 
     <android.support.percent.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/cell_monitor_auto_cell_title"
         android:layout_width="match_parent"
         android:layout_height="30dp"
-        android:layout_gravity="center">
+        android:layout_gravity="center"
+        android:layout_below="@+id/cell_monitor_manual">
 
         <ImageView
             android:layout_width="fill_parent"
@@ -89,8 +94,10 @@
 
     <android.support.percent.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/cell_monitor_auto_cell"
         android:layout_width="match_parent"
-        android:layout_height="40dp">
+        android:layout_height="40dp"
+        android:layout_below="@+id/cell_monitor_auto_cell_title">
 
         <TextView
             android:id="@+id/cell_monitor_list_earfcn"
@@ -109,7 +116,7 @@
             android:gravity="center"
             android:text="@string/page_test_cell_monitor_item_pci"
             app:layout_heightPercent="100%"
-            app:layout_widthPercent="12%" />
+            app:layout_widthPercent="15%" />
 
         <TextView
             android:id="@+id/cell_monitor_list_tai"
@@ -119,7 +126,7 @@
             android:gravity="center"
             android:text="@string/page_test_cell_monitor_item_tai"
             app:layout_heightPercent="100%"
-            app:layout_widthPercent="13%" />
+            app:layout_widthPercent="15%" />
 
         <TextView
             android:id="@+id/cell_monitor_list_sinr"
@@ -127,7 +134,7 @@
             android:layout_height="0dp"
             android:layout_toRightOf="@+id/cell_monitor_list_tai"
             android:gravity="center"
-            android:text="@string/page_test_cell_monitor_item_sinr"
+            android:text="@string/page_test_cell_monitor_item_ecgi"
             app:layout_heightPercent="100%"
             app:layout_widthPercent="20%" />
 
@@ -137,9 +144,9 @@
             android:layout_height="0dp"
             android:layout_toRightOf="@+id/cell_monitor_list_sinr"
             android:gravity="center"
-            android:text="@string/page_test_cell_monitor_item_rsrp"
+            android:text="@string/page_test_cell_monitor_item_sinr"
             app:layout_heightPercent="100%"
-            app:layout_widthPercent="25%" />
+            app:layout_widthPercent="20%" />
 
         <TextView
             android:id="@+id/cell_monitor_list_choose"
@@ -156,13 +163,16 @@
     <ListView
         android:id="@+id/cell_monitor_listView"
         android:layout_width="fill_parent"
-        android:layout_height="200dp" />
+        android:layout_height="200dp"
+        android:layout_below="@+id/cell_monitor_auto_cell"/>
 
     <android.support.percent.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/cell_monitor_cell_list_title"
         android:layout_width="match_parent"
         android:layout_height="30dp"
-        android:layout_gravity="center">
+        android:layout_gravity="center"
+        android:layout_below="@+id/cell_monitor_listView">
 
         <ImageView
             android:layout_width="fill_parent"
@@ -178,8 +188,10 @@
     </android.support.percent.PercentRelativeLayout>
     <android.support.percent.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/cell_monitor_confirm_list"
         android:layout_width="match_parent"
-        android:layout_height="40dp">
+        android:layout_height="40dp"
+        android:layout_below="@+id/cell_monitor_cell_list_title">
 
         <TextView
             android:id="@+id/cell_monitor_confirm_list_earfcn"
@@ -225,5 +237,54 @@
     <ListView
         android:id="@+id/cell_monitor_confirm_listView"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent" />
-</LinearLayout>
+        android:layout_height="fill_parent"
+        android:layout_below="@+id/cell_monitor_confirm_list"
+        android:layout_above="@+id/cell_monitor_device_status_bar"/>
+    <LinearLayout
+        android:id="@+id/cell_monitor_device_status_bar"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:background="#FFBFBFBF"
+        android:layout_alignParentBottom="true">
+        <TextView
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:text="设备状态:"
+            android:textSize="17sp"
+            android:gravity="center"/>
+        <TextView
+            android:id="@+id/cell_monitor_device_status"
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:textSize="17sp"
+            android:text="准备中"/>
+        <TextView
+            android:layout_width="60dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="AGI 1"
+            android:textSize="17sp"/>
+        <TextView
+            android:id="@+id/cell_monitor_device_background_01"
+            android:layout_width="15dp"
+            android:layout_height="20dp"
+            android:background="#FFCC0000"
+            />
+        <TextView
+            android:layout_width="60dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="AGI 2"
+
+            android:textSize="17sp"/>
+        <TextView
+            android:id="@+id/cell_monitor_device_background_02"
+            android:layout_width="15dp"
+            android:layout_height="20dp"
+            android:background="#FFCC0000"
+            />
+    </LinearLayout>
+</RelativeLayout>

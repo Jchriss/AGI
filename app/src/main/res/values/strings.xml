@@ -56,6 +56,7 @@
     <string name="page_test_cell_monitor_item_earfcn">EARFCN</string>
     <string name="page_test_cell_monitor_item_pci">PCI</string>
     <string name="page_test_cell_monitor_item_tai">TAI</string>
+    <string name="page_test_cell_monitor_item_ecgi">E-CGI</string>
     <string name="page_test_cell_monitor_item_sinr">SINR(dB)</string>
     <string name="page_test_cell_monitor_item_rsrp">RSRP(dBm)</string>
     <string name="page_test_cell_monitor_manual_cell">手动指定小区</string>
@@ -125,6 +126,12 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_cell_monitor">CellMonitorActivity</string>
-
-
+    <!-- main menu -->
+    <string name="title_main_menu">主界面</string>
+    <string name="title_main_menu_cell_monitor">守控小区</string>
+    <string name="title_main_menu_find_STMSI">空码搜索</string>
+    <string name="title_main_menu_orientation">目标侧向</string>
+    <string name="title_main_menu_interference_detection">干扰探测</string>
+    <string name="title_main_menu_configuration">参数配置</string>
+    <string name="title_main_menu_cellPhone_info">本机信息</string>
 </resources>
