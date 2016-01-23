@@ -490,7 +490,7 @@ public class CellMonitorActivity extends AppCompatActivity {
     }
 
     /**
-     * for ListView
+     * for confirm ListView
      */
     public final class ConfirmViewHolder {
         public TextView earfcn;

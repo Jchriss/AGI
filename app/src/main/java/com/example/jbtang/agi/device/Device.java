@@ -24,7 +24,7 @@ import java.lang.ref.WeakReference;
 public class Device {
     private String name;
     private TCPClient client;
-    private String IP;
+    protected String IP;
     private int messagePort;
     private int dataPort;
     protected Status.DeviceStatus status;

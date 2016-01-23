@@ -20,7 +20,7 @@ public class Global {
 
     public static class ThreadPool {
         public static final ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
-        public static final ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(5);
+        public static final ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(10);
 
         private ThreadPool() {
 

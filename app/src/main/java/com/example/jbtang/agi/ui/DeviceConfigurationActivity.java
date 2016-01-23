@@ -4,8 +4,11 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,6 +18,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.Switch;
@@ -22,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.jbtang.agi.R;
+import com.example.jbtang.agi.core.Global;
 import com.example.jbtang.agi.core.Status;
 import com.example.jbtang.agi.dao.devices.DeviceDAO;
 import com.example.jbtang.agi.dao.devices.DeviceDBManager;
@@ -29,12 +34,20 @@ import com.example.jbtang.agi.device.Device;
 import com.example.jbtang.agi.device.DeviceManager;
 import com.example.jbtang.agi.device.MonitorDevice;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class DeviceConfigurationActivity extends AppCompatActivity {
 
+    private static final String TAG = "DeviceConfiguration";
     private static final String IP_SPLITTER = ".";
 
     private List<MonitorDevice> devices;
@@ -83,12 +96,20 @@ public class DeviceConfigurationActivity extends AppCompatActivity {
             if (convertView == null) {
                 convertView = mInflater.inflate(R.layout.device_configuration_list_item, null);
                 holder = new ViewHolder();
+                holder.imageView = (ImageView) convertView.findViewById(R.id.device_configuration_item_icon);
                 holder.title = (TextView) convertView.findViewById(R.id.device_configuration_item_title);
                 holder.detailBtn = (Button) convertView.findViewById(R.id.device_configuration_detail_btn);
                 holder.switchBtn = (Switch) convertView.findViewById(R.id.device_configuration_item_btn);
                 convertView.setTag(holder);
             } else {
                 holder = (ViewHolder) convertView.getTag();
+            }
+
+            Status.PingResult pingResult = devices.get(position).getPingStatus();
+            if (pingResult == Status.PingResult.SUCCEED) {
+                holder.imageView.setBackgroundColor(Color.GREEN);
+            } else {
+                holder.imageView.setBackgroundColor(Color.RED);
             }
 
             holder.title.setText(devices.get(position).getName());
@@ -184,9 +205,9 @@ public class DeviceConfigurationActivity extends AppCompatActivity {
             }
         }
         mgr.deleteByName(devices.get(position).getName());
-        devices.remove(position);
-        ListView listView = (ListView) findViewById(R.id.device_configuration_listView);
-        ((MyAdapter) listView.getAdapter()).notifyDataSetChanged();
+        MonitorDevice device = devices.remove(position);
+        device.release();
+        refreshDeviceListView();
     }
 
     private void confirmDelete(final int position) {
@@ -221,6 +242,7 @@ public class DeviceConfigurationActivity extends AppCompatActivity {
     }
 
     public final class ViewHolder {
+        public ImageView imageView;
         public TextView title;
         public Button detailBtn;
         public Switch switchBtn;
@@ -235,6 +257,22 @@ public class DeviceConfigurationActivity extends AppCompatActivity {
         ListView listView = (ListView) findViewById(R.id.device_configuration_listView);
         MyAdapter adapter = new MyAdapter(this);
         listView.setAdapter(adapter);
+        Global.ThreadPool.scheduledThreadPool.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                refreshDeviceListView();
+            }
+        }, 1, 3, TimeUnit.SECONDS);
+    }
+
+    private void refreshDeviceListView() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ListView listView = (ListView) findViewById(R.id.device_configuration_listView);
+                ((MyAdapter) listView.getAdapter()).notifyDataSetChanged();
+            }
+        });
     }
 
     @Override
@@ -319,8 +357,7 @@ public class DeviceConfigurationActivity extends AppCompatActivity {
 
     private void addDeviceToListView(MonitorDevice device) {
         devices.add(device);
-        ListView listView = (ListView) findViewById(R.id.device_configuration_listView);
-        ((MyAdapter) listView.getAdapter()).notifyDataSetChanged();
+        refreshDeviceListView();
     }
 
     private boolean validateInput(String ip) {
