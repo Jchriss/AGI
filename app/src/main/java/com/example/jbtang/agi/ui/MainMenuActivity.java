@@ -1,11 +1,14 @@
 package com.example.jbtang.agi.ui;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -42,21 +45,24 @@ public class MainMenuActivity extends AppCompatActivity {
     private String texts[];
     private int images[];
     private long exitTime = 0;
-    private TextView deviceBackground1;
-    private TextView deviceBackground2;
+    private TextView deviceBackgroundOne;
+    private TextView deviceBackgroundTwo;
     private List<MonitorDevice> devices;
     private DeviceDBManager dmgr;
+    private myBroadcastReceiver broadcastReceiver;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
-
+        init();
+    }
+    public void init(){
         images = new int[]{R.drawable.cell_monitor,
-                            R.drawable.find_stmsi,
-                            R.drawable.orientation,
-                            R.drawable.interference,
-                            R.drawable.configuration,
-                            R.drawable.cellphone_info};
+                R.drawable.find_stmsi,
+                R.drawable.orientation,
+                R.drawable.interference,
+                R.drawable.configuration,
+                R.drawable.cellphone_info};
         texts = new String[]{this.getString(R.string.title_main_menu_cell_monitor),
                 this.getString(R.string.title_main_menu_find_STMSI),
                 this.getString(R.string.title_main_menu_orientation),
@@ -78,18 +84,22 @@ public class MainMenuActivity extends AppCompatActivity {
         gridView = (GridView) findViewById(R.id.main_menu_gridView);
         gridView.setAdapter(simpleAdapter);
         gridView.setOnItemClickListener(new ItemClickListener());
-        /*devices = getDevices();
+
         dmgr = new DeviceDBManager(this);
+        devices = getDevices();
         ListView listView = (ListView) findViewById(R.id.main_menu_device_configuration_listView);
         MyAdapter adapter = new MyAdapter(this);
         listView.setAdapter(adapter);
-        init();*/
-    }
 
+        broadcastReceiver = new myBroadcastReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("DeviceChanges");
+        registerReceiver(broadcastReceiver, filter);
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_device_status, menu);
+        getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
@@ -108,6 +118,7 @@ public class MainMenuActivity extends AppCompatActivity {
                     Toast.LENGTH_SHORT).show();
             exitTime = System.currentTimeMillis();
         } else {
+            dmgr.closeDB();
             finish();
             System.exit(0);
         }
@@ -141,7 +152,7 @@ public class MainMenuActivity extends AppCompatActivity {
             }
         }
     }
-    /*
+
     private List<MonitorDevice> getDevices() {
         List<MonitorDevice> devices = new ArrayList<>();
         List<DeviceDAO> deviceDAOs = dmgr.listDB();
@@ -181,6 +192,7 @@ public class MainMenuActivity extends AppCompatActivity {
             public Button detailBtn;
             public Switch switchBtn;
         }
+        @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             ViewHolder holder;
             if (convertView == null) {
@@ -205,7 +217,6 @@ public class MainMenuActivity extends AppCompatActivity {
             detailListener = new MyListener(position, SelectedBtn.DETAIL);
             holder.detailBtn.setTag(position);
             holder.detailBtn.setOnClickListener(detailListener);
-
             return convertView;
         }
     }
@@ -285,6 +296,7 @@ public class MainMenuActivity extends AppCompatActivity {
         TextView dataPort = (TextView) view.findViewById(R.id.device_configuration_show_dataPort);
         TextView messagePort = (TextView) view.findViewById(R.id.device_configuration_show_messagePort);
         TextView type = (TextView) view.findViewById(R.id.device_configuration_show_type);
+
         name.setText("设备名称 : " + device.getName());
         ip.setText("IP地址 : " + device.getIP());
         dataPort.setText("数据端口 : " + String.valueOf(device.getDataPort()));
@@ -312,11 +324,26 @@ public class MainMenuActivity extends AppCompatActivity {
         }
         dmgr.deleteByName(devices.get(position).getName());
         devices.remove(position);
-        ListView listView = (ListView) findViewById(R.id.device_configuration_listView);
+        ListView listView = (ListView) findViewById(R.id.main_menu_device_configuration_listView);
         ((MyAdapter) listView.getAdapter()).notifyDataSetChanged();
-    }*/
-    public void init(){
-
     }
+     private class myBroadcastReceiver extends BroadcastReceiver{
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // TODO Auto-generated method stub
+        String flag = intent.getStringExtra("action");
+            switch (flag)
+            {
+                case "addDevice":
+                case "deleteDevice":
+                    devices.clear();
+                    devices = getDevices();
+                    ListView listView = (ListView) findViewById(R.id.main_menu_device_configuration_listView);
+                    ((MyAdapter) listView.getAdapter()).notifyDataSetChanged();
+                    break;
+            }
+        }
+    };
 }
 

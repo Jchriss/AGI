@@ -69,19 +69,7 @@ public class ConfigurationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_configuration);
-        dmgr = new DeviceDBManager(this);
-        devices = getDevices();
-        ListView listView = (ListView) findViewById(R.id.device_configuration_listView);
-        MyAdapter adapter = new MyAdapter(this);
-        listView.setAdapter(adapter);
-        triggerSMS = (RadioButton) findViewById(R.id.system_configure_trigger_sms);
-        triggerPhone = (RadioButton) findViewById(R.id.system_configure_trigger_phone);
-        triggerInterval = (EditText) findViewById(R.id.system_configure_trigger_interval);
-        filterInterval = (EditText) findViewById(R.id.system_configure_filter_threshold);
-        receivingAntennaNum = (EditText) findViewById(R.id.system_configure_receiving_antenna_count);
-        totalTriggerCount = (EditText) findViewById(R.id.system_configure_trigger_max);
-        targetPhoneNum = (EditText) findViewById(R.id.system_configure_target);
-        cmgr = new ConfigurationDBManager(this);
+
         initDefaultValue();
     }
 
@@ -268,6 +256,11 @@ public class ConfigurationActivity extends AppCompatActivity {
         devices.remove(position);
         ListView listView = (ListView) findViewById(R.id.device_configuration_listView);
         ((MyAdapter) listView.getAdapter()).notifyDataSetChanged();
+
+        Intent intent = new Intent();  //Itent就是我们要发送的内容
+        intent.putExtra("action","deleteDevice");
+        intent.setAction("DeviceChanges");   //设置你这个广播的action，只有和这个action一样的接受者才能接受者才能接收广播
+        sendBroadcast(intent);   //发送广播
     }
 
     private void confirmDelete(final int position) {
@@ -340,6 +333,11 @@ public class ConfigurationActivity extends AppCompatActivity {
             MonitorDevice device = new MonitorDevice(name, ip.getText().toString(), type);
             addDeviceToDB(device);
             addDeviceToListView(device);
+
+            Intent intent = new Intent();  //Itent就是我们要发送的内容
+            intent.putExtra("action","addDevice");
+            intent.setAction("DeviceChanges");   //设置你这个广播的action，只有和这个action一样的接受者才能接受者才能接收广播
+            sendBroadcast(intent);   //发送广播
         }
     }
 
@@ -401,6 +399,21 @@ public class ConfigurationActivity extends AppCompatActivity {
 
 
     private void initDefaultValue() {
+        dmgr = new DeviceDBManager(this);
+        devices = getDevices();
+        ListView listView = (ListView) findViewById(R.id.device_configuration_listView);
+        MyAdapter adapter = new MyAdapter(this);
+        listView.setAdapter(adapter);
+
+        triggerSMS = (RadioButton) findViewById(R.id.system_configure_trigger_sms);
+        triggerPhone = (RadioButton) findViewById(R.id.system_configure_trigger_phone);
+        triggerInterval = (EditText) findViewById(R.id.system_configure_trigger_interval);
+        filterInterval = (EditText) findViewById(R.id.system_configure_filter_threshold);
+        receivingAntennaNum = (EditText) findViewById(R.id.system_configure_receiving_antenna_count);
+        totalTriggerCount = (EditText) findViewById(R.id.system_configure_trigger_max);
+        targetPhoneNum = (EditText) findViewById(R.id.system_configure_target);
+        cmgr = new ConfigurationDBManager(this);
+
         final ConfigurationDAO dao = cmgr.getConfiguration(Global.UserInfo.user_name);
 
         triggerSMS.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {

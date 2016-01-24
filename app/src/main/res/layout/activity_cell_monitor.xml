@@ -268,7 +268,7 @@
             android:text="AGI 1"
             android:textSize="17sp"/>
         <TextView
-            android:id="@+id/cell_monitor_device_background_01"
+            android:id="@+id/cell_monitor_device_background_one"
             android:layout_width="15dp"
             android:layout_height="20dp"
             android:background="#FFCC0000"
@@ -281,7 +281,7 @@
 
             android:textSize="17sp"/>
         <TextView
-            android:id="@+id/cell_monitor_device_background_02"
+            android:id="@+id/cell_monitor_device_background_two"
             android:layout_width="15dp"
             android:layout_height="20dp"
             android:background="#FFCC0000"
