@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -109,14 +110,14 @@ public class ConfigurationActivity extends AppCompatActivity {
         dmgr.closeDB();
     }
 
-    private List<MonitorDevice> getDevices() {
-        List<MonitorDevice> devices = new ArrayList<>();
-        List<DeviceDAO> deviceDAOs = dmgr.listDB();
-        for (DeviceDAO dao : deviceDAOs) {
-            devices.add(new MonitorDevice(dao.name, dao.ip, dao.type));
-        }
-        return devices;
-    }
+//    private List<MonitorDevice> getDevices() {
+//        List<MonitorDevice> devices = new ArrayList<>();
+//        List<DeviceDAO> deviceDAOs = dmgr.listDB();
+//        for (DeviceDAO dao : deviceDAOs) {
+//            devices.add(new MonitorDevice(dao.name, dao.ip, dao.type));
+//        }
+//        return devices;
+//    }
 
     /**
      * for ListView
@@ -160,7 +161,11 @@ public class ConfigurationActivity extends AppCompatActivity {
                 holder = (ViewHolder) convertView.getTag();
             }
 
-            holder.title.setText(devices.get(position).getName());
+            String temDevice = devices.get(position).getName();
+
+            Log.d("device","device: "+temDevice+"position: " + position);
+            holder.title.setText(temDevice);
+            holder.switchBtn.setChecked(DeviceManager.getInstance().getDevice(temDevice).isConnected());
 
             MyListener switchListener;
             switchListener = new MyListener(position, SelectedBtn.SWITCH);
@@ -245,22 +250,21 @@ public class ConfigurationActivity extends AppCompatActivity {
     }
 
     private void deleteDevice(int position) {
-        if (devices.get(position).isConnected()) {
+        String temDevice = devices.get(position).getName();
+        if (DeviceManager.getInstance().getDevice(temDevice).isConnected()) {
             try {
-                devices.get(position).disconnect();
+                DeviceManager.getInstance().getDevice(temDevice).disconnect();
             } catch (Exception e) {
                 //TODO
             }
         }
-        dmgr.deleteByName(devices.get(position).getName());
+        dmgr.deleteByName(temDevice);
         devices.remove(position);
+        DeviceManager.getInstance().remove(temDevice);
         ListView listView = (ListView) findViewById(R.id.device_configuration_listView);
         ((MyAdapter) listView.getAdapter()).notifyDataSetChanged();
 
-        Intent intent = new Intent();  //Itent就是我们要发送的内容
-        intent.putExtra("action","deleteDevice");
-        intent.setAction("DeviceChanges");   //设置你这个广播的action，只有和这个action一样的接受者才能接受者才能接收广播
-        sendBroadcast(intent);   //发送广播
+        sendMyBroadcast("deleteDevice");
     }
 
     private void confirmDelete(final int position) {
@@ -276,10 +280,11 @@ public class ConfigurationActivity extends AppCompatActivity {
     }
 
     private void switchBtnHandler(int position, CompoundButton buttonView) {
+        String temDevice = devices.get(position).getName();
         if (buttonView.isChecked()) {
             try {
-                devices.get(position).connect();
-                if (!devices.get(position).isConnected()) {
+                DeviceManager.getInstance().getDevice(temDevice).connect();
+                if (!DeviceManager.getInstance().getDevice(temDevice).isConnected()) {
                     buttonView.setChecked(false);
                 }
             } catch (Exception e) {
@@ -287,11 +292,13 @@ public class ConfigurationActivity extends AppCompatActivity {
             }
         } else {
             try {
-                devices.get(position).disconnect();
+                DeviceManager.getInstance().getDevice(temDevice).disconnect();
             } catch (Exception e) {
                 //TODO
             }
         }
+
+        sendMyBroadcast("changeDeviceStatus");
     }
 
     public final class ViewHolder {
@@ -333,11 +340,9 @@ public class ConfigurationActivity extends AppCompatActivity {
             MonitorDevice device = new MonitorDevice(name, ip.getText().toString(), type);
             addDeviceToDB(device);
             addDeviceToListView(device);
+            DeviceManager.getInstance().add(device);
 
-            Intent intent = new Intent();  //Itent就是我们要发送的内容
-            intent.putExtra("action","addDevice");
-            intent.setAction("DeviceChanges");   //设置你这个广播的action，只有和这个action一样的接受者才能接受者才能接收广播
-            sendBroadcast(intent);   //发送广播
+            sendMyBroadcast("addDevice");
         }
     }
 
@@ -382,11 +387,6 @@ public class ConfigurationActivity extends AppCompatActivity {
     }
 
     private void saveToNextStep() {
-        for (MonitorDevice device : devices) {
-            if (device.isConnected()) {
-                DeviceManager.getInstance().add(device);
-            }
-        }
         if (validate()) {
             saveToCache();
             saveToDAO();
@@ -395,16 +395,16 @@ public class ConfigurationActivity extends AppCompatActivity {
         }
         Intent intent = new Intent(this, MainMenuActivity.class);
         startActivity(intent);
+        //ConfigurationActivity.this.finish();
     }
 
 
     private void initDefaultValue() {
         dmgr = new DeviceDBManager(this);
-        devices = getDevices();
+        devices = DeviceManager.getInstance().getDevices();
         ListView listView = (ListView) findViewById(R.id.device_configuration_listView);
         MyAdapter adapter = new MyAdapter(this);
         listView.setAdapter(adapter);
-
         triggerSMS = (RadioButton) findViewById(R.id.system_configure_trigger_sms);
         triggerPhone = (RadioButton) findViewById(R.id.system_configure_trigger_phone);
         triggerInterval = (EditText) findViewById(R.id.system_configure_trigger_interval);
@@ -548,5 +548,11 @@ public class ConfigurationActivity extends AppCompatActivity {
                 Global.Configuration.filterInterval, Global.Configuration.silenceCheckTimer, Global.Configuration.receivingAntennaNum,
                 Global.Configuration.triggerTotalCount, Global.Configuration.targetPhoneNum);
         cmgr.insertOrUpdate(dao);
+    }
+    private void sendMyBroadcast(String actionType){
+        Intent intent = new Intent();  //Itent就是我们要发送的内容
+        intent.putExtra("action",actionType);
+        intent.setAction("DeviceChanges");   //设置你这个广播的action，只有和这个action一样的接受者才能接受者才能接收广播
+        sendBroadcast(intent);   //发送广播
     }
 }

@@ -87,6 +87,9 @@ public class MainMenuActivity extends AppCompatActivity {
 
         dmgr = new DeviceDBManager(this);
         devices = getDevices();
+        for (MonitorDevice device : devices) {
+                DeviceManager.getInstance().add(device);
+        }
         ListView listView = (ListView) findViewById(R.id.main_menu_device_configuration_listView);
         MyAdapter adapter = new MyAdapter(this);
         listView.setAdapter(adapter);
@@ -206,7 +209,10 @@ public class MainMenuActivity extends AppCompatActivity {
                 holder = (ViewHolder) convertView.getTag();
             }
 
-            holder.title.setText(devices.get(position).getName());
+            String temDevice = devices.get(position).getName();
+            Log.d("device","device: "+temDevice+"position: " + position);
+            holder.title.setText(temDevice);
+            holder.switchBtn.setChecked(DeviceManager.getInstance().getDevice(temDevice).isConnected());
 
             MyListener switchListener;
             switchListener = new MyListener(position, SelectedBtn.SWITCH);
@@ -258,10 +264,11 @@ public class MainMenuActivity extends AppCompatActivity {
         }
     }
     private void switchBtnHandler(int position, CompoundButton buttonView) {
+        String temDevice = devices.get(position).getName();
         if (buttonView.isChecked()) {
             try {
-                devices.get(position).connect();
-                if (!devices.get(position).isConnected()) {
+                DeviceManager.getInstance().getDevice(temDevice).connect();
+                if (!DeviceManager.getInstance().getDevice(temDevice).isConnected()) {
                     buttonView.setChecked(false);
                 }
             } catch (Exception e) {
@@ -269,7 +276,7 @@ public class MainMenuActivity extends AppCompatActivity {
             }
         } else {
             try {
-                devices.get(position).disconnect();
+                DeviceManager.getInstance().getDevice(temDevice).disconnect();
             } catch (Exception e) {
                 //TODO
             }
@@ -315,15 +322,17 @@ public class MainMenuActivity extends AppCompatActivity {
                 .show();
     }
     private void deleteDevice(int position) {
-        if (devices.get(position).isConnected()) {
+        String temDevice = devices.get(position).getName();
+        if (DeviceManager.getInstance().getDevice(temDevice).isConnected()) {
             try {
-                devices.get(position).disconnect();
+                DeviceManager.getInstance().getDevice(temDevice).disconnect();
             } catch (Exception e) {
                 //TODO
             }
         }
         dmgr.deleteByName(devices.get(position).getName());
         devices.remove(position);
+        DeviceManager.getInstance().remove(temDevice);
         ListView listView = (ListView) findViewById(R.id.main_menu_device_configuration_listView);
         ((MyAdapter) listView.getAdapter()).notifyDataSetChanged();
     }
@@ -337,8 +346,8 @@ public class MainMenuActivity extends AppCompatActivity {
             {
                 case "addDevice":
                 case "deleteDevice":
-                    devices.clear();
-                    devices = getDevices();
+                case "changeDeviceStatus":
+                    devices = DeviceManager.getInstance().getDevices();
                     ListView listView = (ListView) findViewById(R.id.main_menu_device_configuration_listView);
                     ((MyAdapter) listView.getAdapter()).notifyDataSetChanged();
                     break;
