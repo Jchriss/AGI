@@ -113,7 +113,7 @@ public class FindSTMSI {
         Float rsrp = msg.getMu16Rsrp() * 0.125F;
         DeviceManager.getInstance().getDevice(globalMsg.getDeviceName()).setWorkingStatus(status);
         DeviceManager.getInstance().getDevice(globalMsg.getDeviceName()).getCellInfo().rsrp = rsrp;
-        Log.d(TAG, String.format("==========status : %s, rsrp : %f ============", status.name(), rsrp));
+        Log.e(TAG, String.format("==========status : %s, rsrp : %f ============", status.name(), rsrp));
     }
 
     private void resolveUECaptureMsg(Global.GlobalMsg globalMsg) {

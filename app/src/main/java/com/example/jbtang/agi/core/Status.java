@@ -41,4 +41,9 @@ public class Status {
         OK,
         Failed
     }
+
+    public enum PingResult{
+        SUCCEED,
+        FAILED
+    }
 }

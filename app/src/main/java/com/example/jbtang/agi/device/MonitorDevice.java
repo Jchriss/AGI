@@ -1,5 +1,6 @@
 package com.example.jbtang.agi.device;
 
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.example.jbtang.agi.core.CellInfo;
@@ -10,6 +11,11 @@ import com.example.jbtang.agi.messages.GetFrequentlyUsedMsg;
 import com.example.jbtang.agi.service.OrientationFinding;
 import com.example.jbtang.agi.ui.FindSTMSIActivity;
 import com.example.jbtang.agi.ui.OrientationFindingActivity;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 /**
  * Created by jbtang on 11/1/2015.
@@ -24,6 +30,12 @@ public class MonitorDevice extends Device {
     private boolean isReadyToMonitor;
     private Status.BoardType type;
     private Status.DeviceWorkingStatus workingStatus;
+    private Status.PingResult pingStatus;
+    private AsyncTask task;
+
+    public Status.PingResult getPingStatus() {
+        return pingStatus;
+    }
 
     public Status.DeviceWorkingStatus getWorkingStatus() {
         return workingStatus;
@@ -50,9 +62,14 @@ public class MonitorDevice extends Device {
         this.isReadyToMonitor = false;
         this.type = type;
         this.workingStatus = Status.DeviceWorkingStatus.ABNORMAL;
+        this.pingStatus = Status.PingResult.FAILED;
+        this.task = new NetPing().execute();
     }
 
     public boolean isReady() {
+        if (pingStatus == Status.PingResult.FAILED) {
+            return false;
+        }
         if (status == Status.DeviceStatus.DISCONNECTED) {
             return false;
         }
@@ -121,4 +138,58 @@ public class MonitorDevice extends Device {
         this.isReadyToMonitor = isReadyToMonitor;
     }
 
+    private void ping() {
+        pingStatus = Status.PingResult.FAILED;
+        Process p;
+        try {
+            p = Runtime.getRuntime().exec("ping -c 1 -w 1000 " + IP);
+            int status = p.waitFor();
+            InputStream input = p.getInputStream();
+            BufferedReader in = new BufferedReader(new InputStreamReader(input));
+            StringBuilder builder = new StringBuilder();
+            String line;
+            while ((line = in.readLine()) != null) {
+                builder.append(line);
+            }
+            Log.i(TAG, "Return ============" + builder.toString());
+            if (status == 0) {
+                pingStatus = Status.PingResult.SUCCEED;
+            } else {
+                pingStatus = Status.PingResult.FAILED;
+            }
+            Log.i(TAG, "++++++++++++++++++ status: " + status);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private class NetPing extends AsyncTask<String, String, String> {
+        @Override
+        protected String doInBackground(String... params) {
+            while (!task.isCancelled()) {
+                ping();
+                try {
+                    Thread.sleep(3000);
+                } catch (Exception e) {
+
+                }
+            }
+            return "";
+        }
+    }
+
+    public void release() {
+        try {
+            disconnect();
+            if (!task.isCancelled()) {
+                task.cancel(true);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, String.format("Failed to release device[%s].", IP));
+            e.printStackTrace();
+        }
+
+    }
 }

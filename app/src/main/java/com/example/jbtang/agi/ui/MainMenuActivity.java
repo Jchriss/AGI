@@ -5,11 +5,19 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+<<<<<<< HEAD:app/src/main/java/com/example/jbtang/agi/ui/MainMenuActivity.java
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
+=======
+import android.graphics.Color;
+import android.os.AsyncTask;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.util.Log;
+>>>>>>> refs/remotes/Jchriss/master:app/src/main/java/com/example/jbtang/agi/ui/DeviceConfigurationActivity.java
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -18,7 +26,12 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
+<<<<<<< HEAD:app/src/main/java/com/example/jbtang/agi/ui/MainMenuActivity.java
 import android.widget.GridView;
+=======
+import android.widget.EditText;
+import android.widget.ImageView;
+>>>>>>> refs/remotes/Jchriss/master:app/src/main/java/com/example/jbtang/agi/ui/DeviceConfigurationActivity.java
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Switch;
@@ -26,14 +39,26 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.jbtang.agi.R;
+<<<<<<< HEAD:app/src/main/java/com/example/jbtang/agi/ui/MainMenuActivity.java
+=======
+import com.example.jbtang.agi.core.Global;
+import com.example.jbtang.agi.core.Status;
+>>>>>>> refs/remotes/Jchriss/master:app/src/main/java/com/example/jbtang/agi/ui/DeviceConfigurationActivity.java
 import com.example.jbtang.agi.dao.devices.DeviceDAO;
 import com.example.jbtang.agi.dao.devices.DeviceDBManager;
 import com.example.jbtang.agi.device.DeviceManager;
 import com.example.jbtang.agi.device.MonitorDevice;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by xiang on 2016/1/11.
@@ -94,6 +119,7 @@ public class MainMenuActivity extends AppCompatActivity {
         MyAdapter adapter = new MyAdapter(this);
         listView.setAdapter(adapter);
 
+<<<<<<< HEAD:app/src/main/java/com/example/jbtang/agi/ui/MainMenuActivity.java
         broadcastReceiver = new myBroadcastReceiver();
         IntentFilter filter = new IntentFilter();
         filter.addAction("DeviceChanges");
@@ -105,6 +131,10 @@ public class MainMenuActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
+=======
+    private static final String TAG = "DeviceConfiguration";
+    private static final String IP_SPLITTER = ".";
+>>>>>>> refs/remotes/Jchriss/master:app/src/main/java/com/example/jbtang/agi/ui/DeviceConfigurationActivity.java
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -201,6 +231,7 @@ public class MainMenuActivity extends AppCompatActivity {
             if (convertView == null) {
                 convertView = mInflater.inflate(R.layout.device_configuration_list_item, null);
                 holder = new ViewHolder();
+                holder.imageView = (ImageView) convertView.findViewById(R.id.device_configuration_item_icon);
                 holder.title = (TextView) convertView.findViewById(R.id.device_configuration_item_title);
                 holder.detailBtn = (Button) convertView.findViewById(R.id.device_configuration_detail_btn);
                 holder.switchBtn = (Switch) convertView.findViewById(R.id.device_configuration_item_btn);
@@ -209,10 +240,21 @@ public class MainMenuActivity extends AppCompatActivity {
                 holder = (ViewHolder) convertView.getTag();
             }
 
+<<<<<<< HEAD:app/src/main/java/com/example/jbtang/agi/ui/MainMenuActivity.java
             String temDevice = devices.get(position).getName();
             Log.d("device","device: "+temDevice+"position: " + position);
             holder.title.setText(temDevice);
             holder.switchBtn.setChecked(DeviceManager.getInstance().getDevice(temDevice).isConnected());
+=======
+            Status.PingResult pingResult = devices.get(position).getPingStatus();
+            if (pingResult == Status.PingResult.SUCCEED) {
+                holder.imageView.setBackgroundColor(Color.GREEN);
+            } else {
+                holder.imageView.setBackgroundColor(Color.RED);
+            }
+
+            holder.title.setText(devices.get(position).getName());
+>>>>>>> refs/remotes/Jchriss/master:app/src/main/java/com/example/jbtang/agi/ui/DeviceConfigurationActivity.java
 
             MyListener switchListener;
             switchListener = new MyListener(position, SelectedBtn.SWITCH);
@@ -310,6 +352,24 @@ public class MainMenuActivity extends AppCompatActivity {
         messagePort.setText("消息端口 : " + String.valueOf(device.getMessagePort()));
         type.setText("板卡类型 : " + device.getType().name());
     }
+<<<<<<< HEAD:app/src/main/java/com/example/jbtang/agi/ui/MainMenuActivity.java
+=======
+
+    private void deleteDevice(int position) {
+        if (devices.get(position).isConnected()) {
+            try {
+                devices.get(position).disconnect();
+            } catch (Exception e) {
+                //TODO
+            }
+        }
+        mgr.deleteByName(devices.get(position).getName());
+        MonitorDevice device = devices.remove(position);
+        device.release();
+        refreshDeviceListView();
+    }
+
+>>>>>>> refs/remotes/Jchriss/master:app/src/main/java/com/example/jbtang/agi/ui/DeviceConfigurationActivity.java
     private void confirmDelete(final int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.title_device_configuration_confirm_delete)
@@ -330,11 +390,133 @@ public class MainMenuActivity extends AppCompatActivity {
                 //TODO
             }
         }
+<<<<<<< HEAD:app/src/main/java/com/example/jbtang/agi/ui/MainMenuActivity.java
         dmgr.deleteByName(devices.get(position).getName());
         devices.remove(position);
         DeviceManager.getInstance().remove(temDevice);
         ListView listView = (ListView) findViewById(R.id.main_menu_device_configuration_listView);
         ((MyAdapter) listView.getAdapter()).notifyDataSetChanged();
+=======
+    }
+
+    public final class ViewHolder {
+        public ImageView imageView;
+        public TextView title;
+        public Button detailBtn;
+        public Switch switchBtn;
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_device_configuration);
+        mgr = new DeviceDBManager(this);
+        devices = getDevices();
+        ListView listView = (ListView) findViewById(R.id.device_configuration_listView);
+        MyAdapter adapter = new MyAdapter(this);
+        listView.setAdapter(adapter);
+        Global.ThreadPool.scheduledThreadPool.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                refreshDeviceListView();
+            }
+        }, 1, 3, TimeUnit.SECONDS);
+    }
+
+    private void refreshDeviceListView() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ListView listView = (ListView) findViewById(R.id.device_configuration_listView);
+                ((MyAdapter) listView.getAdapter()).notifyDataSetChanged();
+            }
+        });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_device_configuration, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        switch (id) {
+            case R.id.menu_device_configuration_add_device:
+                showAddDeviceDialog();
+                return true;
+            case R.id.menu_device_configuration_save:
+                saveToNextStep();
+                return true;
+            default:
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mgr.closeDB();
+        System.exit(0);
+    }
+
+    private void showAddDeviceDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = LayoutInflater.from(this);
+        final View view = inflater.inflate(R.layout.device_configuration_add_device, null);
+        final EditText ip = (EditText) view.findViewById(R.id.device_configure_ip);
+        final RadioButton fdd = (RadioButton) view.findViewById(R.id.device_configure_hint_board_type_fdd);
+
+        builder.setTitle(R.string.menu_device_configuration).setIcon(android.R.drawable.ic_dialog_info)
+                .setView(view)
+                .setNegativeButton(R.string.menu_device_configuration_dialog_cancel, null)
+                .setPositiveButton(R.string.menu_device_configuration_dialog_add, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        addDevice(ip, fdd);
+                    }
+                })
+                .show();
+    }
+
+    private void addDevice(EditText ip, RadioButton fdd) {
+        if (validateInput(ip.getText().toString())) {
+            Status.BoardType type;
+            if (fdd.isChecked()) {
+                type = Status.BoardType.FDD;
+            } else {
+                type = Status.BoardType.TDD;
+            }
+            String iptext = ip.getText().toString();
+            String name = MonitorDevice.DEVICE_NAME_PREFIX + iptext.substring(iptext.lastIndexOf(IP_SPLITTER) + 1);
+            MonitorDevice device = new MonitorDevice(name, ip.getText().toString(), type);
+            addDeviceToDB(device);
+            addDeviceToListView(device);
+        }
+    }
+
+    private void addDeviceToDB(MonitorDevice device) {
+        DeviceDAO deviceDAO = new DeviceDAO(
+                device.getName(),
+                device.getIP(),
+                device.getDataPort(),
+                device.getMessagePort(),
+                device.getType());
+        mgr.add(Collections.singletonList(deviceDAO));
+    }
+
+    private void addDeviceToListView(MonitorDevice device) {
+        devices.add(device);
+        refreshDeviceListView();
+>>>>>>> refs/remotes/Jchriss/master:app/src/main/java/com/example/jbtang/agi/ui/DeviceConfigurationActivity.java
     }
      private class myBroadcastReceiver extends BroadcastReceiver{
 
