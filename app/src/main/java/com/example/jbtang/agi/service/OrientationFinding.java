@@ -15,6 +15,7 @@ import com.example.jbtang.agi.messages.ag2pc.MsgCRS_RSRPQI_INFO;
 import com.example.jbtang.agi.messages.ag2pc.MsgL1_PHY_COMMEAS_IND;
 import com.example.jbtang.agi.messages.ag2pc.MsgL1_PROTOCOL_DATA;
 import com.example.jbtang.agi.messages.ag2pc.MsgL1_UL_UE_MEAS;
+import com.example.jbtang.agi.messages.ag2pc.MsgL2P_AG_CELL_CAPTURE_IND;
 import com.example.jbtang.agi.messages.base.MsgTypes;
 import com.example.jbtang.agi.trigger.SMSTrigger;
 import com.example.jbtang.agi.trigger.Trigger;
@@ -53,7 +54,7 @@ public class OrientationFinding {
     private Trigger trigger;
     private Queue<UEInfo> ueInfoQueue;
     private RsrpResult result;
-    private List<Double> cellRSRPList;
+    private List<Float> cellRSRPList;
     private Future future;
     //private boolean needToCount;
     private Handler outHandler;
@@ -74,7 +75,7 @@ public class OrientationFinding {
     public static class OrientationInfo {
         public double PUSCHRsrp;
         public double PUCCHRsrp;
-        public double CellRsrp;
+        public Float CellRsrp;
         public String timeStamp;
 
         private int standardPusch = Integer.MAX_VALUE;
@@ -136,17 +137,23 @@ public class OrientationFinding {
             switch (msg.what) {
                 case MsgTypes.L1_AG_PROTOCOL_DATA_MSG_TYPE:
                     mOuter.get().resolveProtocolDataMsg(globalMsg);
+                    Log.e(TAG, "L1_AG_PROTOCOL_DATA_MSG_TYPE!!!!!!!!!!!!!!!!!!!!!!!");
                     break;
                 case MsgTypes.L1_PHY_COMMEAS_IND_MSG_TYPE:
-                    //mOuter.get().resolvePhyCommeasIndMsg(globalMsg);
+                    mOuter.get().resolvePhyCommeasIndMsg(globalMsg);
+                    Log.e(TAG, "L1_PHY_COMMEAS_IND_MSG_TYPE captured!!!!!!!!!!!!!!!!!!!!!!!");
                     break;
                 case MsgTypes.L2P_AG_UE_CAPTURE_IND_MSG_TYPE:
-                    Log.e(TAG, "handleMessage captured!!!!!!!!!!!!!!!!!!!!!!!");
+                    Log.e(TAG, "L2P_AG_UE_CAPTURE_IND_MSG_TYPE captured!!!!!!!!!!!!!!!!!!!!!!!");
                     mOuter.get().startCount();
                     break;
                 case MsgTypes.L2P_AG_UE_RELEASE_IND_MSG_TYPE:
-                    Log.e(TAG, "handleMessage released!!!!!!!!!!!!!!!!!!!!!!!!");
+                    Log.e(TAG, "L2P_AG_UE_RELEASE_IND_MSG_TYPE released!!!!!!!!!!!!!!!!!!!!!!!!");
                     mOuter.get().stopCount();
+                    break;
+                case MsgTypes.L2P_AG_CELL_CAPTURE_IND_MSG_TYPE:
+                    mOuter.get().resolveCellCaptureMsg(globalMsg);
+                    Log.e(TAG, "L2P_AG_CELL_CAPTURE_IND_MSG_TYPE captured!!!!!!!!!!!!!!!!!!!!!!!");
                     break;
                 default:
                     break;
@@ -214,10 +221,18 @@ public class OrientationFinding {
         if (isCRSChType(msg.getMstL1PHYComentIndHeader().getMu32MeasSelect())) {
             MsgCRS_RSRPQI_INFO crs_rsrpqi_info = new MsgCRS_RSRPQI_INFO(
                     MsgSendHelper.getSubByteArray(globalMsg.getBytes(), MsgL1_PHY_COMMEAS_IND.byteArrayLen, MsgCRS_RSRPQI_INFO.byteArrayLen));
-            cellRSRPList.add(crs_rsrpqi_info.getMstCrs0RsrpqiInfo().getMs16CRS_RP() * 0.125);
+            cellRSRPList.add(crs_rsrpqi_info.getMstCrs0RsrpqiInfo().getMs16CRS_RP() * 0.125F);
         }
     }
-
+    private void resolveCellCaptureMsg(Global.GlobalMsg globalMsg) {
+        MsgL2P_AG_CELL_CAPTURE_IND msg = new MsgL2P_AG_CELL_CAPTURE_IND(globalMsg.getBytes());
+        Status.DeviceWorkingStatus status = msg.getMu16Rsrp() == 0 ? Status.DeviceWorkingStatus.ABNORMAL : Status.DeviceWorkingStatus.NORMAL;
+        Float rsrp = msg.getMu16Rsrp() * 1.0F;
+        int pci = msg.getMu16PCI();
+        DeviceManager.getInstance().getDevice(globalMsg.getDeviceName()).setWorkingStatus(status);
+        DeviceManager.getInstance().getDevice(globalMsg.getDeviceName()).getCellInfo().rsrp = rsrp;
+        Log.e(TAG, String.format("==========status : %s, rsrp : %f ============", status.name(), rsrp) + "PCI:" + pci);
+    }
     private boolean isCRSChType(long type) {
         return (type & 0x2000) == 0x2000;
     }
@@ -226,11 +241,15 @@ public class OrientationFinding {
         @Override
         public void run() {
             result.log();
+
+            Message msg = new Message();
             if (/*needToCount &&*/ !ueInfoQueue.isEmpty()) {
-                Message msg = new Message();
                 msg.obj = getOrientationInfo();
-                outHandler.sendMessage(msg);
+            }else{
+                msg.obj = null;
             }
+
+            outHandler.sendMessage(msg);
         }
     }
 
@@ -240,18 +259,21 @@ public class OrientationFinding {
         info.timeStamp = new SimpleDateFormat("HH:mm:ss", Locale.CHINA).format(new Date());
         info.PUCCHRsrp = result.average(PUCCH);
         info.PUSCHRsrp = result.average(PUSCH);
-        //info.CellRsrp = getCellRsrp();
-        Log.d(TAG, String.format("============ PUCCH = %f , PUSCH = %f, CELL = %f, Time = %s. ==============",
+        info.CellRsrp = getCellRsrp();
+        DeviceManager.getInstance().getDevices().get(0).getCellInfo().rsrp = info.CellRsrp;
+        Log.e(TAG, String.format("============ PUCCH = %f , PUSCH = %f, CELL = %f, Time = %s. ==============",
                 info.PUCCHRsrp, info.PUSCHRsrp, info.CellRsrp, info.timeStamp));
         return info;
     }
 
-    private double getCellRsrp() {
-        double ret = 0;
+    private Float getCellRsrp() {
+        Float ret = 0F;
         for (int index = 0; index < cellRSRPList.size(); index++) {
             ret += cellRSRPList.get(index);
         }
-        return ret / cellRSRPList.size();
+        ret /= cellRSRPList.size();
+        cellRSRPList.clear();
+        return ret;
     }
 
     class RsrpResult {

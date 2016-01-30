@@ -1,15 +1,19 @@
 package com.example.jbtang.agi.messages.ag2pc;
 
+import android.util.Log;
+
 import com.example.jbtang.agi.core.MsgSendHelper;
 import com.example.jbtang.agi.core.type.U16;
 import com.example.jbtang.agi.core.type.U32;
 import com.example.jbtang.agi.core.type.U8;
+import com.example.jbtang.agi.messages.base.MsgHeader;
 
 /**
  * define message cell capture ind
  * Created by jbtang on 10/5/2015.
  */
 public class MsgL2P_AG_CELL_CAPTURE_IND {
+    private MsgHeader header;
     private U8[] TimeStampH;//size 4
     private U32 TimeStampL;
     private U16 mu16CellStatus;
@@ -150,6 +154,7 @@ public class MsgL2P_AG_CELL_CAPTURE_IND {
     }
 
     public MsgL2P_AG_CELL_CAPTURE_IND() {
+        header = new MsgHeader();
         TimeStampH = new U8[4];
         TimeStampL = new U32();
         mu16CellStatus = new U16();
@@ -170,6 +175,8 @@ public class MsgL2P_AG_CELL_CAPTURE_IND {
     public MsgL2P_AG_CELL_CAPTURE_IND(byte[] bytes) {
         validate(bytes);
         int pos = 0;
+        header = new MsgHeader(MsgSendHelper.getSubByteArray(bytes, pos, MsgHeader.byteArrayLen));
+        pos += MsgHeader.byteArrayLen;
         TimeStampH = new U8[]{
                 new U8(MsgSendHelper.getSubByteArray(bytes, pos++, U8.byteArrayLen)),
                 new U8(MsgSendHelper.getSubByteArray(bytes, pos++, U8.byteArrayLen)),

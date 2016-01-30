@@ -157,7 +157,8 @@ public class MonitorDevice extends Device {
             } else {
                 pingStatus = Status.PingResult.FAILED;
             }
-            Log.i(TAG, "++++++++++++++++++ status: " + status);
+            Log.i(TAG, "++++++++++++++++++ status: " + status+"pingstatus: "+pingStatus);
+            //Log.d("changeDevice", "DeviceMonitor  devicename:" + this.getName() + " hashcode:" + this.hashCode());
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {

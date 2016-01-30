@@ -8,6 +8,7 @@ public class CellInfo {
     public Integer earfcn;
     public Short pci;
     public Short tai;
+    public Integer ecgi;
     public Float sinr;
     public Float rsrp;
 
@@ -15,6 +16,7 @@ public class CellInfo {
         this.earfcn = Integer.MAX_VALUE;
         this.pci = Short.MAX_VALUE;
         this.tai = Short.MAX_VALUE;
+        this.ecgi = Integer.MAX_VALUE;
         this.sinr = Float.NaN;
         this.rsrp = Float.NaN;
     }

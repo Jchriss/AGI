@@ -29,7 +29,7 @@
         android:gravity="center" />
 
     <TextView
-        android:id="@+id/cell_monitor_item_sinr"
+        android:id="@+id/cell_monitor_item_ecgi"
         android:layout_width="80dp"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/cell_monitor_item_tai"
@@ -37,10 +37,10 @@
         android:gravity="center" />
 
     <TextView
-        android:id="@+id/cell_monitor_item_rsrp"
+        android:id="@+id/cell_monitor_item_sinr"
         android:layout_width="80dp"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/cell_monitor_item_sinr"
+        android:layout_toRightOf="@+id/cell_monitor_item_ecgi"
         android:layout_centerVertical="true"
         android:gravity="center" />
 
@@ -48,7 +48,7 @@
         android:id="@+id/cell_monitor_item_choose"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/cell_monitor_item_rsrp"
+        android:layout_toRightOf="@+id/cell_monitor_item_sinr"
         android:layout_centerVertical="true"
         android:gravity="center" />
 

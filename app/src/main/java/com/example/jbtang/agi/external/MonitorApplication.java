@@ -37,6 +37,8 @@ public class MonitorApplication extends Application {
 
     public static final String BROAD_TO_MAIN_ACTIVITY = "com.example.jbtang.agi.ui.TestCellMonitorActivity";
     public static final String BROAD_TO_ORIENTATION_ACTIVITY = "com.example.jbtang.agi.ui.OrientationFindingActivity";
+    public static final String BROAD_FROM_MAIN_MENU_ACTIVITY = "com.example.jbtang.agi.ui.MainMenuActivity";
+    public static final String BROAD_FROM_CONFIGURATION_ACTIVITY = "com.example.jbtang.agi.ui.ConfigurationActivity";
 
     //static data for view display
     public static LTEServCellMessage data_ServCell = new LTEServCellMessage();

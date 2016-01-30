@@ -4,11 +4,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <LinearLayout
+        android:id="@+id/main_menu_head_image"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:orientation="vertical"
+        android:background="@drawable/main_menu_image">
+    </LinearLayout>
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:orientation="horizontal"
         android:gravity="center"
-        android:id="@+id/main_menu_target_phone_bar">
+        android:id="@+id/main_menu_target_phone_bar"
+        android:layout_below="@+id/main_menu_head_image">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
@@ -41,15 +50,24 @@
         android:layout_height="1dip"
         android:background="#000000"
         android:layout_below="@+id/main_menu_gridView"/>
-    <ListView
-        android:id="@+id/main_menu_device_configuration_listView"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:divider="#000000"
-        android:dividerHeight="1dip"
-        android:clickable="true"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/main_menu_devide_line"
-        android:layout_above="@+id/main_menu_device_status_bar"/>
+        android:gravity="center"
+        android:layout_marginTop="20dp">
+        <Button
+            android:id="@+id/main_menu_device_connnect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="连接"
+            android:layout_marginRight="30dp"/>
+        <Button
+            android:id="@+id/main_menu_device_disconnect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="断开"/>
+    </LinearLayout>
     <LinearLayout
         android:id="@+id/main_menu_device_status_bar"
         android:layout_width="match_parent"
@@ -65,12 +83,12 @@
             android:textSize="17sp"
             android:gravity="center"/>
         <TextView
-            android:id="@+id/main_menu_device_status"
+            android:id="@+id/main_menu_device_status_text"
             android:layout_width="100dp"
             android:layout_height="match_parent"
             android:gravity="center_vertical"
             android:textSize="17sp"
-            android:text="准备中"/>
+            android:text="未就绪"/>
         <TextView
             android:layout_width="60dp"
             android:layout_height="match_parent"
@@ -81,7 +99,6 @@
             android:id="@+id/main_menu_device_background_one"
             android:layout_width="15dp"
             android:layout_height="20dp"
-            android:background="#FFCC0000"
             />
         <TextView
             android:layout_width="60dp"
@@ -94,7 +111,6 @@
             android:id="@+id/main_menu_device_background_two"
             android:layout_width="15dp"
             android:layout_height="20dp"
-            android:background="#FFCC0000"
             />
     </LinearLayout>
 </RelativeLayout>

@@ -3,10 +3,12 @@ package com.example.jbtang.agi.ui;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,7 +23,12 @@ import android.widget.TextView;
 
 import com.example.jbtang.agi.R;
 import com.example.jbtang.agi.core.Global;
+import com.example.jbtang.agi.core.Status;
+import com.example.jbtang.agi.device.DeviceManager;
+import com.example.jbtang.agi.messages.base.MsgTypes;
 import com.example.jbtang.agi.service.FindSTMSI;
+
+import org.w3c.dom.Text;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -35,16 +42,17 @@ public class FindSTMSIActivity extends AppCompatActivity {
     private boolean startToFind;
 
     private List<FindSTMSI.CountSortedInfo> countSortedInfoList;
-    private List<FindSTMSI.TimeSortedInfo> timeSortedInfoList;
 
     private Button startButton;
     private Button stopButton;
     private TextView triggeredCount;
     private TextView targetPhone;
     private ListView count;
-    private ListView time;
     private EditText targetSTMSI;
     private myHandler handler;
+    private TextView cellConfirmColor;
+    private TextView cellRsrpColor;
+    private TextView pciNum;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +60,6 @@ public class FindSTMSIActivity extends AppCompatActivity {
         setContentView(R.layout.activity_find_stmsi);
 
         countSortedInfoList = new ArrayList<>();
-        timeSortedInfoList = new ArrayList<>();
         startToFind = false;
         init();
     }
@@ -86,6 +93,14 @@ public class FindSTMSIActivity extends AppCompatActivity {
         triggeredCount = (TextView) findViewById(R.id.find_stmsi_triggered_count);
         targetPhone = (TextView) findViewById(R.id.find_stmsi_target_phone_num);
         targetSTMSI = (EditText) findViewById(R.id.find_stmsi_target_stmsi);
+        cellConfirmColor = (TextView)findViewById(R.id.find_stmsi_confirm_background);
+        cellRsrpColor = (TextView)findViewById(R.id.find_stmsi_rsrp_background);
+        pciNum = (TextView)findViewById(R.id.find_stmsi_pci_num);
+
+//        FindSTMSI.CountSortedInfo info = new FindSTMSI.CountSortedInfo();
+//        info.stmsi = "FFFFFF";
+//        info.count = "10";
+//        countSortedInfoList.add(info);
 
         count = (ListView) findViewById(R.id.find_stmsi_count_listView);
         CountAdapter countAdapter = new CountAdapter(this);
@@ -97,10 +112,6 @@ public class FindSTMSIActivity extends AppCompatActivity {
                 targetSTMSI.setText(countSortedInfoList.get(position).stmsi);
             }
         });
-
-        //time = (ListView) findViewById(R.id.find_stmsi_time_listView);
-        TimeAdapter timeAdapter = new TimeAdapter(this);
-        //time.setAdapter(timeAdapter);
 
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -128,6 +139,8 @@ public class FindSTMSIActivity extends AppCompatActivity {
                 }
             }
         }, 1, 3, TimeUnit.SECONDS);
+
+
     }
 
     private void refresh() {
@@ -136,14 +149,27 @@ public class FindSTMSIActivity extends AppCompatActivity {
             public void run() {
                 countSortedInfoList.clear();
                 countSortedInfoList.addAll(FindSTMSI.getInstance().getCountSortedInfoList());
-                timeSortedInfoList.clear();
-                timeSortedInfoList.addAll(FindSTMSI.getInstance().getTimeSortedInfoList());
                 ((CountAdapter) count.getAdapter()).notifyDataSetChanged();
-                ((TimeAdapter) time.getAdapter()).notifyDataSetChanged();
+                if (DeviceManager.getInstance().getDevices().get(0).getWorkingStatus() == Status.DeviceWorkingStatus.NORMAL) {
+                    Float rsrp = DeviceManager.getInstance().getDevices().get(0).getCellInfo().rsrp;
+                    cellConfirmColor.setBackgroundColor(Color.GREEN);
+                    if (rsrp >= -90) {
+                        cellRsrpColor.setBackgroundColor(Color.GREEN);
+                    } else if (rsrp < -90 && rsrp >= -100) {
+                        cellRsrpColor.setBackgroundColor(Color.YELLOW);
+                    } else if (rsrp < -100 && rsrp >= -110) {
+                        cellRsrpColor.setBackgroundColor(Color.MAGENTA);
+                    } else if (rsrp < -110) {
+                        cellRsrpColor.setBackgroundColor(Color.RED);
+                    }
+                } else {
+                    cellConfirmColor.setBackgroundColor(Color.RED);
+                    cellRsrpColor.setBackgroundColor(Color.RED);
+                }
+                pciNum.setText(DeviceManager.getInstance().getDevices().get(0).getCellInfo().pci.toString());
             }
         });
     }
-
     static class myHandler extends Handler {
         private final WeakReference<FindSTMSIActivity> mOuter;
 
@@ -155,6 +181,7 @@ public class FindSTMSIActivity extends AppCompatActivity {
         public void handleMessage(Message msg) {
             mOuter.get().refresh();
         }
+
     }
 
     /**
@@ -163,6 +190,9 @@ public class FindSTMSIActivity extends AppCompatActivity {
     private final class CountViewHolder {
         public TextView stmsi;
         public TextView count;
+        public TextView time;
+        public TextView pci;
+        public TextView earfcn;
     }
 
     private class CountAdapter extends BaseAdapter {
@@ -198,6 +228,9 @@ public class FindSTMSIActivity extends AppCompatActivity {
                 holder = new CountViewHolder();
                 holder.stmsi = (TextView) convertView.findViewById(R.id.find_stmsi_count_list_item_stmsi);
                 holder.count = (TextView) convertView.findViewById(R.id.find_stmsi_count_list_item_count);
+                holder.time = (TextView) convertView.findViewById(R.id.find_stmsi_count_list_item_time);
+                holder.pci = (TextView) convertView.findViewById(R.id.find_stmsi_count_list_item_pci);
+                holder.earfcn = (TextView) convertView.findViewById(R.id.find_stmsi_count_list_item_earfcn);
                 convertView.setTag(holder);
             } else {
                 holder = (CountViewHolder) convertView.getTag();
@@ -205,6 +238,9 @@ public class FindSTMSIActivity extends AppCompatActivity {
 
             holder.stmsi.setText(countSortedInfoList.get(position).stmsi);
             holder.count.setText(countSortedInfoList.get(position).count);
+            holder.time.setText(countSortedInfoList.get(position).time);
+            holder.pci.setText(countSortedInfoList.get(position).pci);
+            holder.earfcn.setText(countSortedInfoList.get(position).earfcn);
             return convertView;
         }
     }
@@ -212,65 +248,12 @@ public class FindSTMSIActivity extends AppCompatActivity {
     /**
      * for count ListView
      */
-    private final class TimeViewHolder {
-        public TextView stmsi;
-        public TextView time;
-        public TextView pci;
-        public TextView board;
-    }
-
-    private class TimeAdapter extends BaseAdapter {
-
-        private LayoutInflater mInflater;
-
-        public TimeAdapter(Context context) {
-            this.mInflater = LayoutInflater.from(context);
-        }
-
-        @Override
-        public int getCount() {
-            // TODO Auto-generated method stub
-            return timeSortedInfoList.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
-        public long getItemId(int position) {
-            // TODO Auto-generated method stub
-            return 0;
-        }
-
-        public View getView(int position, View convertView, ViewGroup parent) {
-            final TimeViewHolder holder;
-            if (convertView == null) {
-                convertView = mInflater.inflate(R.layout.find_stmsi_time_list_item, null);
-                holder = new TimeViewHolder();
-                holder.stmsi = (TextView) convertView.findViewById(R.id.find_stmsi_time_list_item_stmsi);
-                holder.time = (TextView) convertView.findViewById(R.id.find_stmsi_time_list_item_time);
-                holder.pci = (TextView) convertView.findViewById(R.id.find_stmsi_time_list_item_pci);
-                holder.board = (TextView) convertView.findViewById(R.id.find_stmsi_time_list_item_board);
-                convertView.setTag(holder);
-            } else {
-                holder = (TimeViewHolder) convertView.getTag();
-            }
-
-            holder.stmsi.setText(timeSortedInfoList.get(position).stmsi);
-            holder.time.setText(timeSortedInfoList.get(position).time);
-            holder.pci.setText(timeSortedInfoList.get(position).pci);
-            holder.board.setText(timeSortedInfoList.get(position).board);
-            return convertView;
-        }
-    }
 
     private void saveToNext() {
         String stmsi = targetSTMSI.getText().toString();
         if (validateSTMSI(stmsi)) {
             Intent intent = new Intent(this, MainMenuActivity.class);
+            Global.TARGET_STMSI = stmsi;
             intent.putExtra(Global.TARGET_STMSI, stmsi);
             startActivity(intent);
         }

@@ -50,32 +50,14 @@
         <activity
             android:name=".ui.MainMenuActivity"
             android:label="@string/app_name"
-<<<<<<< HEAD
             android:launchMode="singleTask">
             >
-=======
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
-
->>>>>>> refs/remotes/Jchriss/master
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-<<<<<<< HEAD
-=======
-
-        <activity
-            android:name=".ui.DeviceConfigurationActivity"
-            android:label="@string/title_activity_device_configuration"
-            android:launchMode="singleTask" >
-        </activity>
-        <activity
-            android:name=".ui.SystemConfigurationActivity"
-            android:label="@string/title_activity_system_configuration"
-            android:launchMode="singleTask" />
->>>>>>> refs/remotes/Jchriss/master
         <activity
             android:name=".ui.FindSTMSIActivity"
             android:label="@string/title_main_menu_find_STMSI"

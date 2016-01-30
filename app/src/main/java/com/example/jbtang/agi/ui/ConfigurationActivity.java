@@ -18,7 +18,6 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RadioButton;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,8 +28,8 @@ import com.example.jbtang.agi.dao.configuration.ConfigurationDAO;
 import com.example.jbtang.agi.dao.configuration.ConfigurationDBManager;
 import com.example.jbtang.agi.dao.devices.DeviceDAO;
 import com.example.jbtang.agi.dao.devices.DeviceDBManager;
-import com.example.jbtang.agi.device.DeviceManager;
 import com.example.jbtang.agi.device.MonitorDevice;
+import com.example.jbtang.agi.external.MonitorApplication;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -65,6 +64,8 @@ public class ConfigurationActivity extends AppCompatActivity {
     private static final int DEFAULT_RECEIVINGANTENNANUM = 2;
     private static final int DEFAULT_TOTAL_TRIGGER_COUNT = 30;
     private static final Pattern PHONE_NUMBER = Pattern.compile("^((13[0-9])|(15[^4,\\D])|(18[0-9]))\\d{8}$");
+    public static final String ADD_DEVICE_FLAG = "addDeviceFlag";
+    public static final String DELETE_DEVICE_FLAG = "deleteDeviceFlag";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,15 +111,6 @@ public class ConfigurationActivity extends AppCompatActivity {
         dmgr.closeDB();
     }
 
-//    private List<MonitorDevice> getDevices() {
-//        List<MonitorDevice> devices = new ArrayList<>();
-//        List<DeviceDAO> deviceDAOs = dmgr.listDB();
-//        for (DeviceDAO dao : deviceDAOs) {
-//            devices.add(new MonitorDevice(dao.name, dao.ip, dao.type));
-//        }
-//        return devices;
-//    }
-
     /**
      * for ListView
      */
@@ -155,7 +147,6 @@ public class ConfigurationActivity extends AppCompatActivity {
                 holder = new ViewHolder();
                 holder.title = (TextView) convertView.findViewById(R.id.device_configuration_item_title);
                 holder.detailBtn = (Button) convertView.findViewById(R.id.device_configuration_detail_btn);
-                holder.switchBtn = (Switch) convertView.findViewById(R.id.device_configuration_item_btn);
                 convertView.setTag(holder);
             } else {
                 holder = (ViewHolder) convertView.getTag();
@@ -165,15 +156,8 @@ public class ConfigurationActivity extends AppCompatActivity {
 
             Log.d("device","device: "+temDevice+"position: " + position);
             holder.title.setText(temDevice);
-            holder.switchBtn.setChecked(DeviceManager.getInstance().getDevice(temDevice).isConnected());
-
-            MyListener switchListener;
-            switchListener = new MyListener(position, SelectedBtn.SWITCH);
-            holder.switchBtn.setTag(position);
-            holder.switchBtn.setOnClickListener(switchListener);
-            holder.switchBtn.setOnCheckedChangeListener(switchListener);
             MyListener detailListener;
-            detailListener = new MyListener(position, SelectedBtn.DETAIL);
+            detailListener = new MyListener(position);
             holder.detailBtn.setTag(position);
             holder.detailBtn.setOnClickListener(detailListener);
 
@@ -181,42 +165,19 @@ public class ConfigurationActivity extends AppCompatActivity {
         }
     }
 
-    public enum SelectedBtn {
-        DETAIL,
-        SWITCH
-    }
 
-    private class MyListener implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
+    private class MyListener implements View.OnClickListener {
         int mPosition;
-        SelectedBtn selectedBtn;
 
-        public MyListener(int inPosition, SelectedBtn selectedBtn) {
+        public MyListener(int inPosition) {
             this.mPosition = inPosition;
-            this.selectedBtn = selectedBtn;
         }
 
         @Override
         public void onClick(View v) {
-            switch (selectedBtn) {
-                case DETAIL:
                     Toast.makeText(ConfigurationActivity.this, "Detail", Toast.LENGTH_SHORT).show();
                     showDetailInfo(mPosition);
-                    break;
-                default:
-                    break;
-            }
-        }
 
-        @Override
-        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            switch (selectedBtn) {
-                case SWITCH:
-                    Toast.makeText(ConfigurationActivity.this, "Switch", Toast.LENGTH_SHORT).show();
-                    switchBtnHandler(mPosition, buttonView);
-                    break;
-                default:
-                    break;
-            }
         }
     }
 
@@ -250,21 +211,13 @@ public class ConfigurationActivity extends AppCompatActivity {
     }
 
     private void deleteDevice(int position) {
-        String temDevice = devices.get(position).getName();
-        if (DeviceManager.getInstance().getDevice(temDevice).isConnected()) {
-            try {
-                DeviceManager.getInstance().getDevice(temDevice).disconnect();
-            } catch (Exception e) {
-                //TODO
-            }
-        }
-        dmgr.deleteByName(temDevice);
-        devices.remove(position);
-        DeviceManager.getInstance().remove(temDevice);
+        dmgr.deleteByName(devices.get(position).getName());
+        MonitorDevice device = devices.remove(position);
+        device.release();
         ListView listView = (ListView) findViewById(R.id.device_configuration_listView);
         ((MyAdapter) listView.getAdapter()).notifyDataSetChanged();
 
-        sendMyBroadcast("deleteDevice");
+        sendMyBroadcast(DELETE_DEVICE_FLAG,device);
     }
 
     private void confirmDelete(final int position) {
@@ -279,32 +232,9 @@ public class ConfigurationActivity extends AppCompatActivity {
                 .show();
     }
 
-    private void switchBtnHandler(int position, CompoundButton buttonView) {
-        String temDevice = devices.get(position).getName();
-        if (buttonView.isChecked()) {
-            try {
-                DeviceManager.getInstance().getDevice(temDevice).connect();
-                if (!DeviceManager.getInstance().getDevice(temDevice).isConnected()) {
-                    buttonView.setChecked(false);
-                }
-            } catch (Exception e) {
-                buttonView.setChecked(false);
-            }
-        } else {
-            try {
-                DeviceManager.getInstance().getDevice(temDevice).disconnect();
-            } catch (Exception e) {
-                //TODO
-            }
-        }
-
-        sendMyBroadcast("changeDeviceStatus");
-    }
-
     public final class ViewHolder {
         public TextView title;
         public Button detailBtn;
-        public Switch switchBtn;
     }
 
 
@@ -338,11 +268,11 @@ public class ConfigurationActivity extends AppCompatActivity {
             String iptext = ip.getText().toString();
             String name = MonitorDevice.DEVICE_NAME_PREFIX + iptext.substring(iptext.lastIndexOf(IP_SPLITTER) + 1);
             MonitorDevice device = new MonitorDevice(name, ip.getText().toString(), type);
+            device.release();
             addDeviceToDB(device);
             addDeviceToListView(device);
-            DeviceManager.getInstance().add(device);
 
-            sendMyBroadcast("addDevice");
+            sendMyBroadcast(ADD_DEVICE_FLAG,device);
         }
     }
 
@@ -393,15 +323,12 @@ public class ConfigurationActivity extends AppCompatActivity {
             Intent intent = new Intent(this, MainMenuActivity.class);
             startActivity(intent);
         }
-        Intent intent = new Intent(this, MainMenuActivity.class);
-        startActivity(intent);
-        //ConfigurationActivity.this.finish();
     }
 
 
     private void initDefaultValue() {
         dmgr = new DeviceDBManager(this);
-        devices = DeviceManager.getInstance().getDevices();
+        devices = getDevices();
         ListView listView = (ListView) findViewById(R.id.device_configuration_listView);
         MyAdapter adapter = new MyAdapter(this);
         listView.setAdapter(adapter);
@@ -469,15 +396,6 @@ public class ConfigurationActivity extends AppCompatActivity {
         targetPhoneNum.setText(dao == null ? "" : dao.targetPhoneNum);
     }
 
-    private void save() {
-        if (validate()) {
-            saveToCache();
-            saveToDAO();
-            Intent intent = new Intent(this, MainMenuActivity.class);
-            startActivity(intent);
-        }
-    }
-
     private boolean validate() {
         try {
             validateNull();
@@ -532,6 +450,14 @@ public class ConfigurationActivity extends AppCompatActivity {
         }
     }
 
+    private List<MonitorDevice> getDevices() {
+        List<MonitorDevice> devices = new ArrayList<>();
+        List<DeviceDAO> deviceDAOs = dmgr.listDB();
+        for (DeviceDAO dao : deviceDAOs) {
+            devices.add(new MonitorDevice(dao.name, dao.ip, dao.type));
+        }
+        return devices;
+    }
     private void saveToCache() {
         Global.Configuration.name = Global.UserInfo.user_name;
         Global.Configuration.type = triggerSMS.isChecked() ? Status.TriggerType.SMS : Status.TriggerType.PHONE;
@@ -549,10 +475,18 @@ public class ConfigurationActivity extends AppCompatActivity {
                 Global.Configuration.triggerTotalCount, Global.Configuration.targetPhoneNum);
         cmgr.insertOrUpdate(dao);
     }
-    private void sendMyBroadcast(String actionType){
+    private void sendMyBroadcast(String flag,MonitorDevice device){
         Intent intent = new Intent();  //Itent就是我们要发送的内容
-        intent.putExtra("action",actionType);
-        intent.setAction("DeviceChanges");   //设置你这个广播的action，只有和这个action一样的接受者才能接受者才能接收广播
+        intent.putExtra("flag",flag);
+        if(flag.equals(ADD_DEVICE_FLAG)){
+            intent.putExtra("name",device.getName());
+            intent.putExtra("ip",device.getIP());
+            intent.putExtra("type",device.getType());
+        }else if(flag.equals(DELETE_DEVICE_FLAG)){
+            intent.putExtra("name",device.getName());
+            Log.d("changeDevice","send deleteDevice,deviceName: "+ device.getName());
+        }
+        intent.setAction(MonitorApplication.BROAD_FROM_CONFIGURATION_ACTIVITY);   //设置你这个广播的action，只有和这个action一样的接受者才能接受者才能接收广播
         sendBroadcast(intent);   //发送广播
     }
 }

@@ -89,7 +89,7 @@ public class SMSTrigger implements Trigger {
             if (count++ == Global.Configuration.triggerTotalCount) {
                 future.cancel(true);
             }
-            send();
+            //send();
             for (MonitorDevice device : DeviceManager.getInstance().getDevices()) {
                 device.startMonitor(Status.Service.FINDSTMIS);
             }
@@ -134,7 +134,7 @@ public class SMSTrigger implements Trigger {
                 }
                 start = true;
             }
-            send();
+            //send();
         }
     }
 

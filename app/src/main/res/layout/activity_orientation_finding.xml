@@ -7,21 +7,21 @@
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/orientation_find_layout_control"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="horizontal">
 
         <Button
             android:id="@+id/orientation_find_start"
             android:layout_width="wrap_content"
-            android:layout_height="38dp"
+            android:layout_height="wrap_content"
             android:text="@string/page_orientation_find_start"
             android:textSize="15sp" />
 
         <Button
             android:id="@+id/orientation_find_stop"
             android:layout_width="wrap_content"
-            android:layout_height="38dp"
+            android:layout_height="wrap_content"
             android:text="@string/page_orientation_find_stop"
             android:textSize="15sp" />
 
@@ -165,7 +165,6 @@
             android:id="@+id/orientation_confirm_background"
             android:layout_width="15dp"
             android:layout_height="20dp"
-            android:background="#FFCC0000"
             />
         <TextView
             android:layout_width="90dp"
@@ -174,10 +173,9 @@
             android:text="信号强度"
             android:textSize="17sp"/>
         <TextView
-            android:id="@+id/orientation_sinr_background"
+            android:id="@+id/orientation_rsrp_background"
             android:layout_width="15dp"
             android:layout_height="20dp"
-            android:background="#FFCC0000"
             />
         <TextView
             android:layout_width="70dp"
@@ -186,6 +184,7 @@
             android:textSize="17sp"
             android:text="PCI"/>
         <TextView
+            android:id="@+id/orientation_pci_num"
             android:layout_width="50dp"
             android:layout_height="match_parent"
             android:gravity="center"

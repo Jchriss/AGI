@@ -33,19 +33,10 @@
         android:id="@+id/device_configuration_detail_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toLeftOf="@+id/device_configuration_item_btn"
-        android:layout_centerVertical="true"
-        android:layout_marginRight="10dip"
-        android:text="@string/page_device_configure_detail" />
-
-    <Switch
-        android:id="@+id/device_configuration_item_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:layout_marginRight="10dip"
-        android:textOff="@string/page_device_configure_switch_off"
-        android:textOn="@string/page_device_configure_switch_on"/>
+        android:layout_marginRight="40dip"
+        android:text="@string/page_device_configure_detail" />
+
 
 </RelativeLayout>

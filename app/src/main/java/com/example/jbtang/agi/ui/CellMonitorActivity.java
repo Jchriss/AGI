@@ -11,6 +11,7 @@ import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,6 +32,7 @@ import com.example.jbtang.agi.device.MonitorDevice;
 import com.example.jbtang.agi.external.MonitorApplication;
 import com.example.jbtang.agi.external.service.MonitorService;
 import com.example.jbtang.agi.service.CellMonitor;
+
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -58,6 +60,9 @@ public class CellMonitorActivity extends AppCompatActivity {
     private List<CellInfo> cellInfoList;
     private Set<CellInfo> monitorCellSet;
     private List<CellInfo> monitorCellList;
+    private TextView deviceStatusText;
+    private TextView deviceColorOne;
+    private TextView deviceColorTwo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +96,59 @@ public class CellMonitorActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public void initData() {
+        MyApp = (MonitorApplication) getApplication();
+        IntentFilter filter = new IntentFilter(MonitorApplication.BROAD_TO_MAIN_ACTIVITY);
+        filter.addAction(MonitorApplication.BROAD_FROM_MAIN_MENU_ACTIVITY);
+        registerReceiver(receiver, filter);
+
+        manualEARFCN = (EditText) findViewById(R.id.cell_monitor_manual_earfcn);
+        manualPCI = (EditText) findViewById(R.id.cell_moitor_manual_pci);
+        manualChoose = (CheckBox) findViewById(R.id.cell_moitor_manual_choose);
+
+        cellInfoList = new ArrayList<>();
+
+        listView = (ListView) findViewById(R.id.cell_monitor_listView);
+        MyAdapter adapter = new MyAdapter(this);
+        listView.setAdapter(adapter);
+
+        monitorCellList = new ArrayList<>();
+        confirmListView = (ListView) findViewById(R.id.cell_monitor_confirm_listView);
+        MyConfirmAdapter confirmAdapter = new MyConfirmAdapter(this);
+        confirmListView.setAdapter(confirmAdapter);
+
+        monitorCellSet = new HashSet<>();
+        manualChoose.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (!validateManualEarfcn()) {
+                    buttonView.setChecked(false);
+                    return;
+                }
+
+                CellInfo info = new CellInfo();
+                info.earfcn = Integer.parseInt(manualEARFCN.getText().toString());
+                info.pci = Short.parseShort(manualPCI.getText().toString());
+                if (isChecked) {
+                    monitorCellSet.add(info);
+                } else {
+                    monitorCellSet.remove(info);
+                }
+                monitorCellList = new ArrayList<>(monitorCellSet);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ((MyConfirmAdapter) confirmListView.getAdapter()).notifyDataSetChanged();
+                    }
+                });
+            }
+        });
+
+        deviceStatusText = (TextView) findViewById(R.id.cell_monitor_device_status_text);
+        deviceColorOne = (TextView) findViewById(R.id.cell_monitor_device_background_one);
+        deviceColorTwo = (TextView) findViewById(R.id.cell_monitor_device_background_two);
+
+    }
     private MonitorService mBoundService;
 
     private ServiceConnection connection = new ServiceConnection() {
@@ -131,19 +189,37 @@ public class CellMonitorActivity extends AppCompatActivity {
     }
 
     private final MyBroadcastReceiver receiver = new MyBroadcastReceiver();
-
     class MyBroadcastReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-
+            //Log.d("Broadcast","recive a broadcast: "+intent.getAction());
             if (intent.getAction().equals("")) {
                 return;
             }
-            refreshView(intent);
+            if(intent.getAction().equals(MonitorApplication.BROAD_FROM_MAIN_MENU_ACTIVITY)){
+                refreshStatusBar(intent);
+            }
+            else {
+                refreshView(intent);
+            }
         }
     }
 
+    private void refreshStatusBar(Intent intent){
+        final int colorOne = intent.getIntExtra("colorOne",0xFFFF0000);
+        final int colorTwo = intent.getIntExtra("colorTwo",0xFFFF0000);
+        final String statusText = intent.getStringExtra("statusText");
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                deviceColorOne.setBackgroundColor(colorOne);
+                deviceColorTwo.setBackgroundColor(colorTwo);
+                deviceStatusText.setText(statusText);
+                //Log.d("Broadcast","refresh");
+            }
+        });
+    }
     private void refreshView(Intent intent) {
 
         int flag = intent.getFlags();
@@ -190,6 +266,7 @@ public class CellMonitorActivity extends AppCompatActivity {
             info.earfcn = mServCellMessage.getEARFCN();
             info.pci = mServCellMessage.getPCI();
             info.tai = mServCellMessage.getTAC();
+            info.ecgi = mServCellMessage.getCellId();
 
             if (cellInfoList.isEmpty()) {
                 cellInfoList.add(info);
@@ -204,6 +281,7 @@ public class CellMonitorActivity extends AppCompatActivity {
             if (!cellInfoList.isEmpty()) {
                 cellInfoList.get(0).sinr = mPwrInfoMessage.getSINR();
                 cellInfoList.get(0).rsrp = mPwrInfoMessage.getRSRP();
+
             }
         }
     }
@@ -251,52 +329,7 @@ public class CellMonitorActivity extends AppCompatActivity {
 
     public MonitorApplication MyApp;
 
-    public void initData() {
-        MyApp = (MonitorApplication) getApplication();
-        IntentFilter filter = new IntentFilter(MonitorApplication.BROAD_TO_MAIN_ACTIVITY);
-        registerReceiver(receiver, filter);
-        manualEARFCN = (EditText) findViewById(R.id.cell_monitor_manual_earfcn);
-        manualPCI = (EditText) findViewById(R.id.cell_moitor_manual_pci);
-        manualChoose = (CheckBox) findViewById(R.id.cell_moitor_manual_choose);
 
-        cellInfoList = new ArrayList<>();
-
-        listView = (ListView) findViewById(R.id.cell_monitor_listView);
-        MyAdapter adapter = new MyAdapter(this);
-        listView.setAdapter(adapter);
-
-        monitorCellList = new ArrayList<>();
-        confirmListView = (ListView) findViewById(R.id.cell_monitor_confirm_listView);
-        MyConfirmAdapter confirmAdapter = new MyConfirmAdapter(this);
-        confirmListView.setAdapter(confirmAdapter);
-
-        monitorCellSet = new HashSet<>();
-        manualChoose.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (!validateManualEarfcn()) {
-                    buttonView.setChecked(false);
-                    return;
-                }
-
-                CellInfo info = new CellInfo();
-                info.earfcn = Integer.parseInt(manualEARFCN.getText().toString());
-                info.pci = Short.parseShort(manualPCI.getText().toString());
-                if (isChecked) {
-                    monitorCellSet.add(info);
-                } else {
-                    monitorCellSet.remove(info);
-                }
-                monitorCellList = new ArrayList<>(monitorCellSet);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ((MyConfirmAdapter) confirmListView.getAdapter()).notifyDataSetChanged();
-                    }
-                });
-            }
-        });
-    }
 
     private boolean validateManualEarfcn() {
         if (manualEARFCN.getText().toString().isEmpty() || manualPCI.getText().toString().isEmpty()) {
@@ -317,8 +350,8 @@ public class CellMonitorActivity extends AppCompatActivity {
         public TextView earfcn;
         public TextView pci;
         public TextView tai;
+        public TextView ecgi;
         public TextView sinr;
-        public TextView rsrp;
         public CheckBox choose;
     }
 
@@ -356,8 +389,8 @@ public class CellMonitorActivity extends AppCompatActivity {
                 holder.earfcn = (TextView) convertView.findViewById(R.id.cell_monitor_item_earfcn);
                 holder.pci = (TextView) convertView.findViewById(R.id.cell_monitor_item_pci);
                 holder.tai = (TextView) convertView.findViewById(R.id.cell_monitor_item_tai);
+                holder.ecgi = (TextView) convertView.findViewById(R.id.cell_monitor_item_ecgi);
                 holder.sinr = (TextView) convertView.findViewById(R.id.cell_monitor_item_sinr);
-                holder.rsrp = (TextView) convertView.findViewById(R.id.cell_monitor_item_rsrp);
                 holder.choose = (CheckBox) convertView.findViewById(R.id.cell_monitor_item_choose);
                 convertView.setTag(holder);
             } else {
@@ -389,18 +422,17 @@ public class CellMonitorActivity extends AppCompatActivity {
             nf.setMaximumIntegerDigits(3);
             nf.setMaximumFractionDigits(2);
 
+            final Integer ecgi = cellInfoList.get(position).ecgi;
+            if (!Float.isNaN(ecgi)) {
+                holder.ecgi.setText(nf.format(ecgi));
+            } else {
+                holder.ecgi.setText(CellInfo.NULL_VALUE);
+            }
             final Float sinr = cellInfoList.get(position).sinr;
             if (!Float.isNaN(sinr)) {
                 holder.sinr.setText(nf.format(sinr));
             } else {
                 holder.sinr.setText(CellInfo.NULL_VALUE);
-            }
-
-            final Float rsrp = cellInfoList.get(position).rsrp;
-            if (!Float.isNaN(rsrp)) {
-                holder.rsrp.setText(nf.format(rsrp));
-            } else {
-                holder.rsrp.setText(CellInfo.NULL_VALUE);
             }
 
             holder.choose.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -410,8 +442,8 @@ public class CellMonitorActivity extends AppCompatActivity {
                     info.earfcn = earfcn;
                     info.pci = pci;
                     info.tai = tai;
+                    info.ecgi = ecgi;
                     info.sinr = sinr;
-                    info.rsrp = rsrp;
 
                     if (isChecked) {
                         monitorCellSet.add(info);
@@ -473,6 +505,7 @@ public class CellMonitorActivity extends AppCompatActivity {
             ret.put(type, new ArrayList<MonitorDevice>());
         }
         for (MonitorDevice device : DeviceManager.getInstance().getDevices()) {
+
             ret.get(device.getType()).add(device);
         }
         return ret;
@@ -563,4 +596,5 @@ public class CellMonitorActivity extends AppCompatActivity {
             return convertView;
         }
     }
+
 }
