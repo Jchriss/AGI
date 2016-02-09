@@ -7,21 +7,21 @@
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/orientation_find_layout_control"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="horizontal">
 
         <Button
             android:id="@+id/orientation_find_start"
             android:layout_width="wrap_content"
-            android:layout_height="38dp"
+            android:layout_height="wrap_content"
             android:text="@string/page_orientation_find_start"
             android:textSize="15sp" />
 
         <Button
             android:id="@+id/orientation_find_stop"
             android:layout_width="wrap_content"
-            android:layout_height="38dp"
+            android:layout_height="wrap_content"
             android:text="@string/page_orientation_find_stop"
             android:textSize="15sp" />
 
@@ -39,12 +39,12 @@
             android:layout_width="wrap_content"
             android:layout_height="30dp"
             android:gravity="center_vertical"
-            android:text="@string/page_orientation_find_my_stmsi"
+            android:text="@string/page_find_stmis_current_times"
             android:textSize="15sp" />
 
         <TextView
-            android:id="@+id/orientation_find_my_stmsi"
-            android:layout_width="95dp"
+            android:id="@+id/orientation_triggered_count"
+            android:layout_width="40dp"
             android:layout_height="30dp"
             android:gravity="center_vertical"
             android:textSize="15sp" />
@@ -145,5 +145,49 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_below="@+id/orientation_find_layout_dividen_graph"
+        android:layout_above="@+id/orientation_cell_status_bar"
         android:orientation="horizontal" />
+    <LinearLayout
+        android:id="@+id/orientation_cell_status_bar"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:background="#FFBFBFBF"
+        android:layout_alignParentBottom="true">
+        <TextView
+            android:layout_width="90dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="驻留状态"
+            android:textSize="17sp"/>
+        <TextView
+            android:id="@+id/orientation_confirm_background"
+            android:layout_width="15dp"
+            android:layout_height="20dp"
+            />
+        <TextView
+            android:layout_width="90dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="信号强度"
+            android:textSize="17sp"/>
+        <TextView
+            android:id="@+id/orientation_rsrp_background"
+            android:layout_width="15dp"
+            android:layout_height="20dp"
+            />
+        <TextView
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:gravity="center|right"
+            android:textSize="17sp"
+            android:text="PCI"/>
+        <TextView
+            android:id="@+id/orientation_pci_num"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:textSize="17sp"/>
+    </LinearLayout>
 </RelativeLayout>

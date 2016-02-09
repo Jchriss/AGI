@@ -32,11 +32,12 @@ tasks.withType(com.android.build.gradle.tasks.PackageApplication) { pkgTask ->
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:percent:23.1.0'
-    compile 'com.android.support:appcompat-v7:23.1.0'
-    compile 'com.google.android.gms:play-services:8.1.0'
     compile files('libs/monitorlib.jar')
     compile files('libs/achartengine-1.2.0.jar')
     compile files('libs/core.jar')
     compile files('libs/framework.jar')
+    compile 'com.android.support:percent:23.1.0'
+    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.google.android.gms:play-services:8.4.0'
+    compile 'com.android.support:design:23.1.1'
 }

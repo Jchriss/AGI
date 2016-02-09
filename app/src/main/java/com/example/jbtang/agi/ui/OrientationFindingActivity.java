@@ -4,10 +4,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,6 +23,8 @@ import android.widget.TextView;
 
 import com.example.jbtang.agi.R;
 import com.example.jbtang.agi.core.Global;
+import com.example.jbtang.agi.core.Status;
+import com.example.jbtang.agi.device.DeviceManager;
 import com.example.jbtang.agi.external.MonitorApplication;
 import com.example.jbtang.agi.service.OrientationFinding;
 import com.example.jbtang.agi.utils.BarChartView;
@@ -47,6 +51,9 @@ public class OrientationFindingActivity extends AppCompatActivity {
     private LinearLayout resultGraphLayout;
     private myHandler handler;
     private List<OrientationFinding.OrientationInfo> orientationInfoList;
+    private TextView cellConfirmColor;
+    private TextView cellRsrpColor;
+    private TextView pciNum;
 
     public static List<String> options = Arrays.asList("", "一", "二", "三", "四");
     private BarChartView view;
@@ -57,7 +64,7 @@ public class OrientationFindingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_orientation_finding);
 
         startToFind = false;
-        OrientationFinding.getInstance().targetStmsi = getIntent().getStringExtra(Global.TARGET_STMSI);
+        OrientationFinding.getInstance().targetStmsi = Global.TARGET_STMSI;
         orientationInfoList = new ArrayList<>();
         init();
     }
@@ -85,10 +92,13 @@ public class OrientationFindingActivity extends AppCompatActivity {
     }
 
     private void init() {
-        myStmsiTextView = (TextView) findViewById(R.id.orientation_find_my_stmsi);
+        //myStmsiTextView = (TextView) findViewById(R.id.orientation_find_my_stmsi);
         targetStmsiTextView = (TextView) findViewById(R.id.orientation_find_target_stmsi);
         startButton = (Button) findViewById(R.id.orientation_find_start);
         stopButton = (Button) findViewById(R.id.orientation_find_stop);
+        cellConfirmColor = (TextView)findViewById(R.id.orientation_confirm_background);
+        cellRsrpColor = (TextView)findViewById(R.id.orientation_rsrp_background);
+        pciNum = (TextView)findViewById(R.id.orientation_pci_num);
 
         resultListView = (ListView) findViewById(R.id.orientation_find_result_list);
         resultListView.setAdapter(new MyAdapter(this));
@@ -120,13 +130,17 @@ public class OrientationFindingActivity extends AppCompatActivity {
         OrientationFinding.getInstance().setOutHandler(new myHandler(this));
     }
 
-    private void refresh() {
+    private void refresh(String type) {
+        final String  temtype = type;
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                ((MyAdapter) resultListView.getAdapter()).notifyDataSetChanged();
-                resultListView.setSelection(orientationInfoList.size() - 1);
-                refreshBarChart();
+                if(temtype == "all") {
+                    ((MyAdapter) resultListView.getAdapter()).notifyDataSetChanged();
+                    resultListView.setSelection(orientationInfoList.size() - 1);
+                    refreshBarChart();
+                }
+                refreshCellStatusBar();
             }
         });
     }
@@ -152,7 +166,25 @@ public class OrientationFindingActivity extends AppCompatActivity {
         view.initData(pucchList, puschList, options, "功率图");
         resultGraphLayout.addView(view.getBarChartView());
     }
-
+    private void refreshCellStatusBar(){
+        if(DeviceManager.getInstance().getDevices().get(0).getWorkingStatus()== Status.DeviceWorkingStatus.NORMAL){
+            Float rsrp = DeviceManager.getInstance().getDevices().get(0).getCellInfo().rsrp;
+            cellConfirmColor.setBackgroundColor(Color.GREEN);
+            if(rsrp >= -90){
+                cellRsrpColor.setBackgroundColor(Color.GREEN);
+            }else if(rsrp < -90 && rsrp >= -100){
+                cellRsrpColor.setBackgroundColor(Color.YELLOW);
+            }else if(rsrp < -100 && rsrp >= -110){
+                cellRsrpColor.setBackgroundColor(Color.MAGENTA);
+            }else if(rsrp <-110){
+                cellRsrpColor.setBackgroundColor(Color.RED);
+            }
+        }else{
+            cellConfirmColor.setBackgroundColor(Color.RED);
+            cellRsrpColor.setBackgroundColor(Color.RED);
+        }
+        pciNum.setText(DeviceManager.getInstance().getDevices().get(0).getCellInfo().pci.toString());
+    }
     static class myHandler extends Handler {
         private final WeakReference<OrientationFindingActivity> mOuter;
 
@@ -162,9 +194,14 @@ public class OrientationFindingActivity extends AppCompatActivity {
 
         @Override
         public void handleMessage(Message msg) {
-            OrientationFinding.OrientationInfo info = (OrientationFinding.OrientationInfo) msg.obj;
-            mOuter.get().orientationInfoList.add(info);
-            mOuter.get().refresh();
+            if(msg.obj != null) {
+                OrientationFinding.OrientationInfo info = (OrientationFinding.OrientationInfo) msg.obj;
+                mOuter.get().orientationInfoList.add(info);
+                mOuter.get().refresh("all");
+            }else{
+                mOuter.get().refresh("");
+            }
+
         }
     }
 
@@ -224,7 +261,7 @@ public class OrientationFindingActivity extends AppCompatActivity {
     }
 
 
-    private final MyBroadcastReceiver receiver = new MyBroadcastReceiver();
+    private MyBroadcastReceiver receiver = new MyBroadcastReceiver();
 
     class MyBroadcastReceiver extends BroadcastReceiver {
 
@@ -234,19 +271,19 @@ public class OrientationFindingActivity extends AppCompatActivity {
             if (intent.getAction().equals("")) {
                 return;
             }
-            refreshView(intent);
+            //refreshView(intent);
         }
     }
 
-    private void refreshView(Intent intent) {
-
-        int flag = intent.getFlags();
-        Bundle bundle = intent.getExtras();
-        switch (flag) {
-            case MonitorApplication.STMSI:
-                String stmsi = bundle.getString("msg");
-                myStmsiTextView.setText(stmsi);
-                break;
-        }
-    }
+//    private void refreshView(Intent intent) {
+//
+//        int flag = intent.getFlags();
+//        Bundle bundle = intent.getExtras();
+//        switch (flag) {
+//            case MonitorApplication.STMSI:
+//                String stmsi = bundle.getString("msg");
+//                myStmsiTextView.setText(stmsi);
+//                break;
+//        }
+//    }
 }

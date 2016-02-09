@@ -31,7 +31,7 @@ public class DeviceManager {
     }
 
     public void add(MonitorDevice device) {
-        devices.put(device.getName(), device);
+            devices.put(device.getName(), device);
     }
 
     public void remove(String name) {

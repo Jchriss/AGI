@@ -65,5 +65,5 @@ public class Global {
         }
     }
 
-    public static final String TARGET_STMSI = "Target stmsi";
+    public static String TARGET_STMSI;
 }

@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+
 /**
  * Created by jbtang on 11/1/2015.
  */
@@ -39,32 +40,26 @@ public class FindSTMSI {
     private static final FindSTMSI instance = new FindSTMSI();
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("HH:mm:ss");
 
-    private Map<String, Integer> sTMSI2Count;
+    private Map<String, CountSortedInfo> sTMSI2Count;
     private List<CountSortedInfo> countSortedInfoList;
-    private List<TimeSortedInfo> timeSortedInfoList;
     private myHandler handler;
     private Trigger trigger;
 
     public List<CountSortedInfo> getCountSortedInfoList() {
         countSortedInfoList.clear();
-        Set<Map.Entry<String, Integer>> sortedStmsi = getSortedSTMSI();
-        for (Map.Entry<String, Integer> entry : sortedStmsi) {
-            CountSortedInfo info = new CountSortedInfo();
-            info.stmsi = entry.getKey();
-            info.count = String.valueOf(entry.getValue());
+        CountSortedInfo info;
+        Set<Map.Entry<String, CountSortedInfo>> sortedStmsi = getSortedSTMSI();
+        for (Map.Entry<String, CountSortedInfo> entry : sortedStmsi) {
+            info = entry.getValue();
             countSortedInfoList.add(info);
         }
         return countSortedInfoList;
     }
 
-    public List<TimeSortedInfo> getTimeSortedInfoList() {
-        return timeSortedInfoList;
-    }
 
     private FindSTMSI() {
         sTMSI2Count = new HashMap<>();
         countSortedInfoList = new ArrayList<>();
-        timeSortedInfoList = new ArrayList<>();
         handler = new myHandler(this);
         trigger = SMSTrigger.getInstance();
     }
@@ -72,7 +67,7 @@ public class FindSTMSI {
     public static FindSTMSI getInstance() {
         return instance;
     }
-
+    private static int handlerCount = 0;
     static class myHandler extends Handler {
         private final WeakReference<FindSTMSI> mOuter;
 
@@ -99,7 +94,6 @@ public class FindSTMSI {
         MessageDispatcher.getInstance().RegisterHandler(handler);
         sTMSI2Count.clear();
         countSortedInfoList.clear();
-        timeSortedInfoList.clear();
         trigger.start(activity, Status.Service.FINDSTMIS);
     }
 
@@ -110,10 +104,11 @@ public class FindSTMSI {
     private void resolveCellCaptureMsg(Global.GlobalMsg globalMsg) {
         MsgL2P_AG_CELL_CAPTURE_IND msg = new MsgL2P_AG_CELL_CAPTURE_IND(globalMsg.getBytes());
         Status.DeviceWorkingStatus status = msg.getMu16Rsrp() == 0 ? Status.DeviceWorkingStatus.ABNORMAL : Status.DeviceWorkingStatus.NORMAL;
-        Float rsrp = msg.getMu16Rsrp() * 0.125F;
+        Float rsrp = msg.getMu16Rsrp()*1.0F;
         DeviceManager.getInstance().getDevice(globalMsg.getDeviceName()).setWorkingStatus(status);
         DeviceManager.getInstance().getDevice(globalMsg.getDeviceName()).getCellInfo().rsrp = rsrp;
         Log.e(TAG, String.format("==========status : %s, rsrp : %f ============", status.name(), rsrp));
+        Log.e("cell_capture","mu16PCI:"+msg.getMu16PCI()+" mu16EARFCN:"+msg.getMu16EARFCN()+" mu16TAC:"+msg.getMu16TAC()+" mu16Rsrp:"+msg.getMu16Rsrp()+" mu16Rsrq:"+msg.getMu16Rsrq());
     }
 
     private void resolveUECaptureMsg(Global.GlobalMsg globalMsg) {
@@ -140,27 +135,23 @@ public class FindSTMSI {
             return;
         }
         Log.d(TAG, String.format("---------Find STMSI :  %s -----------", stmsi));
-        int count = sTMSI2Count.containsKey(stmsi) ? sTMSI2Count.get(stmsi) : 0;
-        sTMSI2Count.put(stmsi, ++count);
+        int count = sTMSI2Count.containsKey(stmsi) ? Integer.valueOf(sTMSI2Count.get(stmsi).count) : 0;
+        CountSortedInfo info = new CountSortedInfo();
 
-        TimeSortedInfo info = new TimeSortedInfo();
         info.stmsi = stmsi;
+        info.count = String.valueOf(count + 1);
         info.time = DATE_FORMAT.format(new Date());
-        info.board = globalMsg.getDeviceName();
-        info.pci = String.valueOf(DeviceManager.getInstance().getDevice(info.board).getCellInfo().pci);
-        timeSortedInfoList.add(info);
-
-        for (Map.Entry<String, Integer> entry : sTMSI2Count.entrySet()) {
-            Log.d(TAG, String.format("===================%s : %d =================", entry.getKey(), entry.getValue()));
-        }
+        info.pci = String.valueOf(DeviceManager.getInstance().getDevice(globalMsg.getDeviceName()).getCellInfo().pci);
+        info.earfcn =String.valueOf(DeviceManager.getInstance().getDevice(globalMsg.getDeviceName()).getCellInfo().earfcn);
+        sTMSI2Count.put(stmsi, info);
     }
 
-    private Set<Map.Entry<String, Integer>> getSortedSTMSI() {
-        Set<Map.Entry<String, Integer>> sortedSTMSI = new TreeSet<>(
-                new Comparator<Map.Entry<String, Integer>>() {
-                    public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
-                        Integer d1 = o1.getValue();
-                        Integer d2 = o2.getValue();
+    private Set<Map.Entry<String, CountSortedInfo>> getSortedSTMSI() {
+        Set<Map.Entry<String, CountSortedInfo>> sortedSTMSI = new TreeSet<>(
+                new Comparator<Map.Entry<String, CountSortedInfo>>() {
+                    public int compare(Map.Entry<String, CountSortedInfo> o1, Map.Entry<String, CountSortedInfo> o2) {
+                        Integer d1 = new Integer(o1.getValue().count);
+                        Integer d2 = new Integer(o2.getValue().count);
                         int r = d2.compareTo(d1);
                         if (r != 0) {
                             return r;
@@ -172,6 +163,7 @@ public class FindSTMSI {
         );
         sortedSTMSI.addAll(sTMSI2Count.entrySet());
         return sortedSTMSI;
+
     }
 
     private String padLeft(String src, String pad, int len) {
@@ -187,12 +179,9 @@ public class FindSTMSI {
     public static class CountSortedInfo {
         public String stmsi;
         public String count;
-    }
-
-    public static class TimeSortedInfo {
-        public String stmsi;
         public String time;
         public String pci;
-        public String board;
+        public String earfcn;
     }
+
 }
