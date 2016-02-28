@@ -97,11 +97,6 @@ public class FindSTMSIActivity extends AppCompatActivity {
         cellRsrpColor = (TextView)findViewById(R.id.find_stmsi_rsrp_background);
         pciNum = (TextView)findViewById(R.id.find_stmsi_pci_num);
 
-//        FindSTMSI.CountSortedInfo info = new FindSTMSI.CountSortedInfo();
-//        info.stmsi = "FFFFFF";
-//        info.count = "10";
-//        countSortedInfoList.add(info);
-
         count = (ListView) findViewById(R.id.find_stmsi_count_listView);
         CountAdapter countAdapter = new CountAdapter(this);
         count.setAdapter(countAdapter);
@@ -139,8 +134,6 @@ public class FindSTMSIActivity extends AppCompatActivity {
                 }
             }
         }, 1, 3, TimeUnit.SECONDS);
-
-
     }
 
     private void refresh() {

@@ -43,7 +43,7 @@ public class OrientationFinding {
     private static final Integer UPLINK = 0;
     private static final Integer MAX_RSRP = -45;
     private static final Integer MIN_RSRP = -115;
-    private static final double SINR_THRESHOLD = -10.0D;
+    private static final double SINR_THRESHOLD = 3.0D;
     private static OrientationFinding instance = new OrientationFinding();
     public static final int PUCCH = 7;
     public static final int PUSCH = 5;
@@ -224,6 +224,7 @@ public class OrientationFinding {
             cellRSRPList.add(crs_rsrpqi_info.getMstCrs0RsrpqiInfo().getMs16CRS_RP() * 0.125F);
         }
     }
+
     private void resolveCellCaptureMsg(Global.GlobalMsg globalMsg) {
         MsgL2P_AG_CELL_CAPTURE_IND msg = new MsgL2P_AG_CELL_CAPTURE_IND(globalMsg.getBytes());
         Status.DeviceWorkingStatus status = msg.getMu16Rsrp() == 0 ? Status.DeviceWorkingStatus.ABNORMAL : Status.DeviceWorkingStatus.NORMAL;
@@ -233,6 +234,7 @@ public class OrientationFinding {
         DeviceManager.getInstance().getDevice(globalMsg.getDeviceName()).getCellInfo().rsrp = rsrp;
         Log.e(TAG, String.format("==========status : %s, rsrp : %f ============", status.name(), rsrp) + "PCI:" + pci);
     }
+
     private boolean isCRSChType(long type) {
         return (type & 0x2000) == 0x2000;
     }
@@ -245,7 +247,7 @@ public class OrientationFinding {
             Message msg = new Message();
             if (/*needToCount &&*/ !ueInfoQueue.isEmpty()) {
                 msg.obj = getOrientationInfo();
-            }else{
+            } else {
                 msg.obj = null;
             }
 
@@ -357,7 +359,7 @@ public class OrientationFinding {
             if (info == null) {
                 return false;
             }
-            if (info.rsrp < MIN_RSRP || info.rsrp > MAX_RSRP) {
+            if (info.rsrp < MIN_RSRP || info.rsrp > MAX_RSRP || info.sinr < SINR_THRESHOLD) {
                 return false;
             }
             return true;

@@ -89,7 +89,7 @@ public class SMSTrigger implements Trigger {
             if (count++ == Global.Configuration.triggerTotalCount) {
                 future.cancel(true);
             }
-            //send();
+            send();
             for (MonitorDevice device : DeviceManager.getInstance().getDevices()) {
                 device.startMonitor(Status.Service.FINDSTMIS);
             }
@@ -98,23 +98,6 @@ public class SMSTrigger implements Trigger {
                 public void run() {
                     countTextView.setText(String.valueOf(count));
                 }
-            });
-
-            Global.ThreadPool.cachedThreadPool.execute(new Runnable() {
-
-                @Override
-                public void run() {
-                    try {
-                        Thread.sleep(Global.Configuration.filterInterval * 1000);
-                    } catch (InterruptedException e) {
-                        Log.e(TAG, "run error");
-                    }
-
-                    for (MonitorDevice device : DeviceManager.getInstance().getDevices()) {
-                        device.stopMonitor();
-                    }
-                }
-
             });
         }
     }
@@ -134,7 +117,7 @@ public class SMSTrigger implements Trigger {
                 }
                 start = true;
             }
-            //send();
+            send();
         }
     }
 

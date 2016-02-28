@@ -9,13 +9,15 @@ import com.example.jbtang.agi.core.Status;
 import com.example.jbtang.agi.messages.GenProtocolTraceMsg;
 import com.example.jbtang.agi.messages.GetFrequentlyUsedMsg;
 import com.example.jbtang.agi.service.OrientationFinding;
-import com.example.jbtang.agi.ui.FindSTMSIActivity;
-import com.example.jbtang.agi.ui.OrientationFindingActivity;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
+import ch.ethz.ssh2.Connection;
+import ch.ethz.ssh2.Session;
+import ch.ethz.ssh2.StreamGobbler;
 
 /**
  * Created by jbtang on 11/1/2015.
@@ -25,6 +27,11 @@ public class MonitorDevice extends Device {
     public static final String DEVICE_NAME_PREFIX = "AGI";
     public static final int DATA_PORT = 3333;
     public static final int MESSAGE_PORT = 3334;
+
+    private static final String REBOOT_USERNAME = "root";
+    private static final String REBOOT_PASSWORD = "13M1877";
+    private static final int REBOOT_PORT = 22;
+    private static final String REBOOT_CMD = "reboot";
 
     private CellInfo cellInfo;
     private boolean isReadyToMonitor;
@@ -157,7 +164,7 @@ public class MonitorDevice extends Device {
             } else {
                 pingStatus = Status.PingResult.FAILED;
             }
-            Log.i(TAG, "++++++++++++++++++ status: " + status+"pingstatus: "+pingStatus);
+            Log.i(TAG, "++++++++++++++++++ status: " + status + "pingstatus: " + pingStatus);
             //Log.d("changeDevice", "DeviceMonitor  devicename:" + this.getName() + " hashcode:" + this.hashCode());
         } catch (IOException e) {
             e.printStackTrace();
@@ -179,6 +186,48 @@ public class MonitorDevice extends Device {
             }
             return "";
         }
+    }
+
+    public void reboot()  {
+        Global.ThreadPool.cachedThreadPool.execute(new Runnable() {
+            @Override
+            public void run() {
+                Connection conn = null;
+                Session session = null;
+
+                try {
+                    conn = new Connection(getIP());
+                    conn.connect();
+                    boolean isAuthenticated = conn.authenticateWithPassword(REBOOT_USERNAME, REBOOT_PASSWORD);
+
+                    if (!isAuthenticated) {
+                        Log.e(TAG, "Authentication failed.");
+                    }
+
+                    session = conn.openSession();
+                    session.execCommand(REBOOT_CMD);
+
+                    Log.e(TAG, "Here is some information about the remote host:");
+
+                    InputStream stdout = new StreamGobbler(session.getStdout());
+
+                    BufferedReader br = new BufferedReader(new InputStreamReader(stdout));
+
+                    while (true) {
+                        String line = br.readLine();
+                        if (line == null)
+                            break;
+                        Log.e(TAG, line);
+                    }
+                    Log.e(TAG, "ExitCode: " + session.getExitStatus());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    session.close();
+                    conn.close();
+                }
+            }
+        });
     }
 
     public void release() {

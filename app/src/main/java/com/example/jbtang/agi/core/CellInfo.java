@@ -11,6 +11,7 @@ public class CellInfo {
     public Integer ecgi;
     public Float sinr;
     public Float rsrp;
+    public boolean isChecked;
 
     public CellInfo() {
         this.earfcn = Integer.MAX_VALUE;
@@ -19,6 +20,7 @@ public class CellInfo {
         this.ecgi = Integer.MAX_VALUE;
         this.sinr = Float.NaN;
         this.rsrp = Float.NaN;
+        this.isChecked = false;
     }
 
     public Status.BoardType toBoardType() {

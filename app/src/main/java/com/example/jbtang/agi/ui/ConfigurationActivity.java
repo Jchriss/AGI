@@ -213,11 +213,12 @@ public class ConfigurationActivity extends AppCompatActivity {
     private void deleteDevice(int position) {
         dmgr.deleteByName(devices.get(position).getName());
         MonitorDevice device = devices.remove(position);
-        device.release();
-        ListView listView = (ListView) findViewById(R.id.device_configuration_listView);
-        ((MyAdapter) listView.getAdapter()).notifyDataSetChanged();
+        device.reboot();
+        //device.release();
+        //ListView listView = (ListView) findViewById(R.id.device_configuration_listView);
+        //((MyAdapter) listView.getAdapter()).notifyDataSetChanged();
 
-        sendMyBroadcast(DELETE_DEVICE_FLAG,device);
+        //sendMyBroadcast(DELETE_DEVICE_FLAG,device);
     }
 
     private void confirmDelete(final int position) {

@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.IBinder;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
@@ -26,6 +27,7 @@ import android.widget.TextView;
 
 import com.example.jbtang.agi.R;
 import com.example.jbtang.agi.core.CellInfo;
+import com.example.jbtang.agi.core.Global;
 import com.example.jbtang.agi.core.Status;
 import com.example.jbtang.agi.device.DeviceManager;
 import com.example.jbtang.agi.device.MonitorDevice;
@@ -41,6 +43,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import io.fmaster.GSMNCellListMessage;
 import io.fmaster.GSMServCellMessage;
@@ -57,6 +60,7 @@ public class CellMonitorActivity extends AppCompatActivity {
     private CheckBox manualChoose;
     private ListView listView;
     private ListView confirmListView;
+    private List<CellInfo> updatingCellInfoList;
     private List<CellInfo> cellInfoList;
     private Set<CellInfo> monitorCellSet;
     private List<CellInfo> monitorCellList;
@@ -107,6 +111,7 @@ public class CellMonitorActivity extends AppCompatActivity {
         manualChoose = (CheckBox) findViewById(R.id.cell_moitor_manual_choose);
 
         cellInfoList = new ArrayList<>();
+        updatingCellInfoList = new ArrayList<>();
 
         listView = (ListView) findViewById(R.id.cell_monitor_listView);
         MyAdapter adapter = new MyAdapter(this);
@@ -129,18 +134,12 @@ public class CellMonitorActivity extends AppCompatActivity {
                 CellInfo info = new CellInfo();
                 info.earfcn = Integer.parseInt(manualEARFCN.getText().toString());
                 info.pci = Short.parseShort(manualPCI.getText().toString());
+                info.isChecked = isChecked;
                 if (isChecked) {
                     monitorCellSet.add(info);
                 } else {
                     monitorCellSet.remove(info);
                 }
-                monitorCellList = new ArrayList<>(monitorCellSet);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ((MyConfirmAdapter) confirmListView.getAdapter()).notifyDataSetChanged();
-                    }
-                });
             }
         });
 
@@ -149,6 +148,7 @@ public class CellMonitorActivity extends AppCompatActivity {
         deviceColorTwo = (TextView) findViewById(R.id.cell_monitor_device_background_two);
 
     }
+
     private MonitorService mBoundService;
 
     private ServiceConnection connection = new ServiceConnection() {
@@ -172,6 +172,26 @@ public class CellMonitorActivity extends AppCompatActivity {
         startService(startIntent);
         //Intent intent=new Intent(this,MonitorService.class);
         bindService(startIntent, connection, 0);
+
+        Global.ThreadPool.scheduledThreadPool.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                monitorCellList = new ArrayList<>();
+                cellInfoList = new ArrayList<>(updatingCellInfoList);
+                for (CellInfo info : cellInfoList) {
+                    if (info.isChecked) {
+                        monitorCellList.add(info);
+                    }
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ((MyConfirmAdapter) confirmListView.getAdapter()).notifyDataSetChanged();
+                        ((MyAdapter) listView.getAdapter()).notifyDataSetChanged();
+                    }
+                });
+            }
+        }, 1, 2, TimeUnit.SECONDS);
     }
 
     @Override
@@ -189,6 +209,7 @@ public class CellMonitorActivity extends AppCompatActivity {
     }
 
     private final MyBroadcastReceiver receiver = new MyBroadcastReceiver();
+
     class MyBroadcastReceiver extends BroadcastReceiver {
 
         @Override
@@ -197,18 +218,17 @@ public class CellMonitorActivity extends AppCompatActivity {
             if (intent.getAction().equals("")) {
                 return;
             }
-            if(intent.getAction().equals(MonitorApplication.BROAD_FROM_MAIN_MENU_ACTIVITY)){
+            if (intent.getAction().equals(MonitorApplication.BROAD_FROM_MAIN_MENU_ACTIVITY)) {
                 refreshStatusBar(intent);
-            }
-            else {
+            } else {
                 refreshView(intent);
             }
         }
     }
 
-    private void refreshStatusBar(Intent intent){
-        final int colorOne = intent.getIntExtra("colorOne",0xFFFF0000);
-        final int colorTwo = intent.getIntExtra("colorTwo",0xFFFF0000);
+    private void refreshStatusBar(Intent intent) {
+        final int colorOne = intent.getIntExtra("colorOne", 0xFFFF0000);
+        final int colorTwo = intent.getIntExtra("colorTwo", 0xFFFF0000);
         final String statusText = intent.getStringExtra("statusText");
         runOnUiThread(new Runnable() {
             @Override
@@ -220,6 +240,7 @@ public class CellMonitorActivity extends AppCompatActivity {
             }
         });
     }
+
     private void refreshView(Intent intent) {
 
         int flag = intent.getFlags();
@@ -252,12 +273,6 @@ public class CellMonitorActivity extends AppCompatActivity {
             default:
                 break;
         }
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                ((MyAdapter) listView.getAdapter()).notifyDataSetChanged();
-            }
-        });
     }
 
     private void SCELL_refresh(LTEServCellMessage mServCellMessage) {
@@ -267,20 +282,21 @@ public class CellMonitorActivity extends AppCompatActivity {
             info.pci = mServCellMessage.getPCI();
             info.tai = mServCellMessage.getTAC();
             info.ecgi = mServCellMessage.getCellId();
+            info.isChecked = monitorCellSet.contains(info);
 
-            if (cellInfoList.isEmpty()) {
-                cellInfoList.add(info);
+            if (updatingCellInfoList.isEmpty()) {
+                updatingCellInfoList.add(info);
             } else {
-                cellInfoList.set(0, info);
+                updatingCellInfoList.set(0, info);
             }
         }
     }
 
     private void PWR_INFO_refresh(LTEPwrInfoMessage mPwrInfoMessage) {
         if (mPwrInfoMessage != null) {
-            if (!cellInfoList.isEmpty()) {
-                cellInfoList.get(0).sinr = mPwrInfoMessage.getSINR();
-                cellInfoList.get(0).rsrp = mPwrInfoMessage.getRSRP();
+            if (!updatingCellInfoList.isEmpty()) {
+                updatingCellInfoList.get(0).sinr = mPwrInfoMessage.getSINR();
+                updatingCellInfoList.get(0).rsrp = mPwrInfoMessage.getRSRP();
 
             }
         }
@@ -301,13 +317,17 @@ public class CellMonitorActivity extends AppCompatActivity {
                 info.earfcn = ncellInfo.getEARFCN();
                 info.pci = (short) ncellInfo.getPCI();
                 info.rsrp = ncellInfo.getRSRP();
+                info.isChecked = monitorCellSet.contains(info);
                 ret.add(info);
             }
-            cellInfoList = new ArrayList<>(ret);
-            /*if (ret.size() > 1) {
-                cellInfoList = cellInfoList.subList(0, 1);
-                //cellInfoList.addAll(ret.subList(1, ret.size()));
-            }*/
+
+            if (ret.size() > 1) {
+                synchronized (updatingCellInfoList) {
+                    CellInfo serveCell = updatingCellInfoList.get(0);
+                    updatingCellInfoList = new ArrayList<>(ret);
+                    updatingCellInfoList.set(0, serveCell);
+                }
+            }
         }
     }
 
@@ -328,7 +348,6 @@ public class CellMonitorActivity extends AppCompatActivity {
     }
 
     public MonitorApplication MyApp;
-
 
 
     private boolean validateManualEarfcn() {
@@ -381,7 +400,7 @@ public class CellMonitorActivity extends AppCompatActivity {
             return 0;
         }
 
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(final int position, View convertView, ViewGroup parent) {
             final ViewHolder holder;
             if (convertView == null) {
                 convertView = mInflater.inflate(R.layout.cell_monitor_list_item, null);
@@ -438,27 +457,18 @@ public class CellMonitorActivity extends AppCompatActivity {
             holder.choose.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    CellInfo info = new CellInfo();
-                    info.earfcn = earfcn;
-                    info.pci = pci;
-                    info.tai = tai;
-                    info.ecgi = ecgi;
-                    info.sinr = sinr;
+                    CellInfo info = cellInfoList.get(position);
+                    info.isChecked = isChecked;
 
                     if (isChecked) {
                         monitorCellSet.add(info);
                     } else {
                         monitorCellSet.remove(info);
                     }
-                    monitorCellList = new ArrayList<>(monitorCellSet);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            ((MyConfirmAdapter) confirmListView.getAdapter()).notifyDataSetChanged();
-                        }
-                    });
                 }
             });
+            holder.choose.setChecked(monitorCellSet.contains(cellInfoList.get(position)));
+
             return convertView;
         }
     }
@@ -516,6 +526,7 @@ public class CellMonitorActivity extends AppCompatActivity {
         for (Status.BoardType type : Status.BoardType.values()) {
             ret.put(type, new ArrayList<CellInfo>());
         }
+        monitorCellSet = new HashSet<>(monitorCellList);
         for (CellInfo info : monitorCellSet) {
             ret.get(info.toBoardType()).add(info);
         }
